@@ -57,7 +57,7 @@ void uthread_exit(void) {
     vaild = queue_dequeue(readyThreadsQueue, (void **)&currThread);
 
     // Queue is not empty
-    if (vaild)
+    if (vaild == SUCC)
     {
         // Destroy the stack of that thread
         uthread_ctx_destroy_stack(uthread_ctx_alloc_stack());
