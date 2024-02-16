@@ -97,14 +97,21 @@ int uthread_create(uthread_func_t func, void *arg)
     return SUCC;
 }
 
+queue_t threadsRunning = queue_create();
+queue_t threadsExited = queue_create();
+
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	/* TODO Phase 2 */
-    queue_t threadsRunning = queue_create();
-    queue_t threadsExited = queue_create();
     struct uthread_tcb *mainThread;
     struct uthread_tcb *currentThread;
     int vaild;
+
+    // Set up preemption if preempt is true
+    if (preempt) 
+    {
+        preempt_start(true);
+    }
     
     mainThread = malloc(sizeof(struct uthread_tcb));
     if (!mainThread) 
@@ -124,18 +131,11 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     mainThread->exited = false;
     queue_enqueue(threadsRunning, mainThread);
 
-    // Set up preemption if preempt is true
-    if (preempt) 
-    {
-        preempt_start(true);
-    }
-
     // Start the scheduling loop 
     while(queue_dequeue(threadsRunning, (void **)&currentThread) == 0  || queue_length(threadsRunning) != 0) 
     {
         if (!currentThread->exited) 
         {
-            currentThread->exited = true;
             queue_enqueue(threadsRunning, currentThread);
             uthread_ctx_switch(&(mainThread->context), &(currentThread->context));
         } 
@@ -152,8 +152,8 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     }
 
     // Clean up
-    queue_destroy(threadsRunning);
-    queue_destroy(threadsExited);
+    //queue_destroy(threadsRunning);
+    //queue_destroy(threadsExited);
     free(mainThread);
     
     return SUCC;  // Success
