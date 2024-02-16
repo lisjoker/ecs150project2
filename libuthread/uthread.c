@@ -52,10 +52,11 @@ void uthread_exit(void) {
     struct uthread_tcb *prev = uthread_current();
     struct uthread_tcb *next;
 
-    uthread_ctx_destroy_stack(currThread->stack);
+    uthread_ctx_destroy_stack(uthread_ctx_alloc_stack());
     queue_dequeue(readyThreadsQueue, (void **)&currThread);
     next = currThread;
     uthread_ctx_switch(&(prev->context), &(next->context));
+
 }
 
 int uthread_create(uthread_func_t func, void *arg) {
