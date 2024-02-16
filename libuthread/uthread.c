@@ -114,12 +114,12 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     }
 
     vaild = uthread_ctx_init(&(mainThread->context), uthread_ctx_alloc_stack(), func, arg);
-    if (vaild == ERR) 
-    {
+    //if (vaild == ERR) 
+    //{
         // Context initialization failure
-        free(mainThread);
-        return ERR;  
-    }
+    //    free(mainThread);
+    //    return ERR;  
+    //}
 
     mainThread->exited = false;
     queue_enqueue(threadQueue, mainThread);
@@ -127,7 +127,21 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     // Start the scheduling loop 
     while(queue_length(threadQueue) > 1)
     {
-        uthread_yield();
+        struct uthread_tcb *currentThread = uthread_current();
+        struct uthread_tcb *nextThread;
+
+        // Load the next thread in ready queue
+        int loaded = queue_dequeue(threadQueue, (void **)&nextThread);
+
+        // there exist thread to yield
+        if (loaded == 0)
+        {
+            // Save the current thread to the ready queue
+            queue_enqueue(threadQueue, currentThread);
+
+            // Switch the contexts of the old and new thread
+            uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
+        }
     }
 
     // Stop preemption if it was started
