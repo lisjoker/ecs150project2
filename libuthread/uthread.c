@@ -68,28 +68,36 @@ void uthread_exit(void) {
 }
 
 int uthread_create(uthread_func_t func, void *arg) {
-    struct uthread_tcb *newThread = malloc(sizeof(struct uthread_tcb));
-    if (newThread == NULL) {
-        return -1;
+    struct uthread_tcb *newThread; 
+    int vaild;
+
+    newThread = malloc(sizeof(struct uthread_tcb));
+    if (newThread == NULL) 
+    {
+        // Fail to create new thread
+        return ERR;
     }
 
-    newThread->stack = uthread_ctx_alloc_stack();
-    if (newThread->stack == NULL) {
-        return -1;
+    vaild = uthread_ctx_init(&(newThread->context), uthread_ctx_alloc_stack(), func, arg)
+    if (vaild == ERR) 
+    {
+        // Memory allocation failure
+        return ERR;
     }
 
-    if (uthread_ctx_init(&(newThread->context), newThread->stack, func, arg) ==
-        -1) {
-        return -1;
-    }
+    // Success creating new thread, add it to ready queue
     queue_enqueue(readyThreadsQueue, newThread);
 
-    return 0;
+    return SUCC;
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
+    struct uthread_tcb *idleThread
+    
+    // Initialize the queue
     readyThreadsQueue = queue_create();
-    struct uthread_tcb *idleThread = malloc(sizeof(struct uthread_tcb));
+
+    idleThread = malloc(sizeof(struct uthread_tcb));
     if (idleThread == NULL) {
         return -1;
     }
