@@ -108,7 +108,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     }
     
     mainThread = malloc(sizeof(struct uthread_tcb));
-    if (!mainThread) 
+    if (mainThread == NULL) 
     {
         // Memory allocation failure
         return ERR;
@@ -132,13 +132,13 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
         struct uthread_tcb *nextThread;
 
         // Load the next thread in ready queue
-        int loaded = queue_dequeue(threadQueue, (void **)&nextThread);
+        int loaded = queue_dequeue(threadsRunning, (void **)&nextThread);
 
         // there exist thread to yield
         if (loaded == 0)
         {
             // Save the current thread to the ready queue
-            queue_enqueue(threadQueue, currentThread);
+            queue_enqueue(threadsRunning, currentThread);
 
             // Switch the contexts of the old and new thread
             uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
