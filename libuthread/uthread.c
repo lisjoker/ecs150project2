@@ -99,8 +99,7 @@ int uthread_create(uthread_func_t func, void *arg)
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
-	/* TODO Phase 2 */ 
-    printf("here4\n");
+	/* TODO Phase 2 
     queue_t threadsRunning = queue_create();
     queue_t threadsExited = queue_create();
     struct uthread_tcb *mainThread;
@@ -157,13 +156,12 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     free(mainThread);
 
     return SUCC;  // Success
-	
+	*/
 }
 
 void uthread_block(void)
 {
 	/* TODO Phase 3 */
-    printf("here5\n");
     //struct uthread_tcb *currentThread = uthread_current();
     //currentThread->exited = true;
     //uthread_yield();
@@ -172,7 +170,6 @@ void uthread_block(void)
 void uthread_unblock(struct uthread_tcb *uthread)
 {
 	/* TODO Phase 3 */
-    printf("here6\n");
     if (uthread != NULL) {
         uthread->exited = false;
         queue_enqueue(threadQueue, uthread);
