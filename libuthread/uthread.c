@@ -32,15 +32,10 @@ struct uthread_tcb *uthread_current(void) {
 
 void uthread_yield(void) {
     struct uthread_tcb *prev = uthread_current();
-    struct uthread_tcb *next;
 
-    // Move the current thread to the readyThreads queue
-    queue_enqueue(readyThreads, prev);
-
-    // Dequeue the next thread from the readyThreads queue
-    if (queue_dequeue(readyThreads, (void **)&next) == SUCC) {
-        uthread_ctx_switch(&(prev->context), &(next->context));
-    }
+    queue_enqueue(readyThreads, currThread);
+    queue_dequeue(readyThreads, (void **)&currThread);
+    uthread_ctx_switch(&(prev->context), &(currThread->context));
 }
 
 void uthread_exit(void) {
