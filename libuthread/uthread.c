@@ -109,12 +109,25 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
         // Memory allocation failure
         return ERR;
     }
-    currThread = idleThread;
+
     uthread_create(func, arg);
 
-    // printf("here\n");
+    currThread = idleThread;
     while (queue_length(readyThreadsQueue) > 0) {
-        uthread_yield();
+        struct uthread_tcb *oldThread = uthread_current();
+        int vaild;
+
+        // Save the old thread to queue
+        queue_enqueue(readyThreadsQueue, oldThread);
+        // Load the new thred from queue
+        vaild = queue_dequeue(readyThreadsQueue, (void **)&currThread);
+
+        // Queue is not empty
+        if (vaild == SUCC) 
+        {
+            // Switch the context between old and new thread
+            uthread_ctx_switch(&(oldThread->context), &(currThread->context));
+        }
     }
     queue_destroy(readyThreadsQueue);
     return 0;
