@@ -93,6 +93,7 @@ int uthread_create(uthread_func_t func, void *arg) {
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     struct uthread_tcb *idleThread;
+    struct uthread_tcb *oldThread;
     int vaild;
 
     // Initialize the queue
@@ -112,22 +113,16 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
 
     uthread_create(func, arg);
 
-    currThread = idleThread;
+    //currThread = idleThread;
     while (queue_length(readyThreadsQueue) > 0) {
-        struct uthread_tcb *oldThread = uthread_current();
-        int vaild;
+        oldThread = uthread_current();
 
         // Save the old thread to queue
         queue_enqueue(readyThreadsQueue, oldThread);
         // Load the new thred from queue
-        vaild = queue_dequeue(readyThreadsQueue, (void **)&currThread);
-
-        // Queue is not empty
-        if (vaild == SUCC) 
-        {
-            // Switch the context between old and new thread
-            uthread_ctx_switch(&(oldThread->context), &(currThread->context));
-        }
+        queue_dequeue(readyThreadsQueue, (void **)&idleThread);
+        // Switch the context between old and new thread
+        uthread_ctx_switch(&(oldThread->context), &(idleThread->context));
     }
     queue_destroy(readyThreadsQueue);
     return 0;
