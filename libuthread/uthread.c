@@ -91,7 +91,6 @@ int uthread_create(uthread_func_t func, void *arg) {
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     struct uthread_tcb *idleThread;
     struct uthread_tcb *oldThread;
-    struct uthread_tcb *temp;
     //queue_t runQueue;
     int vaild;
 
@@ -110,9 +109,24 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
         return ERR;
     }
 
-    //uthread_create(func, arg);
-    temp = idleThread;
-    queue_enqueue(ThreadsQueue, temp);
+    struct uthread_tcb *newThread; 
+
+    newThread = malloc(sizeof(struct uthread_tcb));
+    if (newThread == NULL) 
+    {
+        // Fail to create new thread
+        return ERR;
+    }
+
+    vaild = uthread_ctx_init(&(newThread->context), uthread_ctx_alloc_stack(), func, arg);
+    if (vaild == ERR) 
+    {
+        // Memory allocation failure
+        return ERR;
+    }
+
+    // Success creating new thread, add it to ready queue
+    queue_enqueue(ThreadsQueue, newThread);
 
     currThread = idleThread;
     while (queue_length(ThreadsQueue) > 0) {
