@@ -98,7 +98,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	/* TODO Phase 2 */
     threadQueue = queue_create();
     struct uthread_tcb *mainThread;
-    int vaild;
+    //int vaild;
 
     // Set up preemption if preempt is true
     if (preempt) 
@@ -113,7 +113,8 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
         return ERR;
     }
 
-    vaild = uthread_ctx_init(&(mainThread->context), uthread_ctx_alloc_stack(), func, arg);
+    uthread_ctx_init(&(mainThread->context), uthread_ctx_alloc_stack(), func, arg);
+    //vaild = uthread_ctx_init(&(mainThread->context), uthread_ctx_alloc_stack(), func, arg);
     //if (vaild == ERR) 
     //{
         // Context initialization failure
