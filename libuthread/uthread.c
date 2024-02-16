@@ -67,7 +67,7 @@ void uthread_yield(void)
     queue_enqueue(threadQueue, currentThread);
     queue_dequeue(threadQueue, (void **)&currentThread);
     nextThread = currentThread;
-    uthread_ctx_switch(&(prev->context), &(nextThread->context));
+    uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
 }
 
 // Mark the current thread as exited and yield to the next thread
@@ -79,7 +79,7 @@ void uthread_exit(void)
     //uthread_yield();
     struct uthread_tcb *next;
     uthread_ctx_destroy_stack(uthread_ctx_alloc_stack());
-    queue_dequeue(threadQueue, (void **)&currThread);
+    queue_dequeue(threadQueue, (void **)&currentThread);
     next = currentThread;
     uthread_ctx_switch(&(currentThread->context), &(next->context));
 }
