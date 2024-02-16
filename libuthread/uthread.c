@@ -96,8 +96,8 @@ int uthread_create(uthread_func_t func, void *arg)
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	/* TODO Phase 2 */
-    queue_t threadsRunning = queue_create();
-    queue_t threadsExited = queue_create();
+    threadQueue = queue_create();
+    struct uthread_tcb *currThread = uthread_current();
     struct uthread_tcb *mainThread;
     int vaild;
 
@@ -123,26 +123,16 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     }
 
     mainThread->exited = false;
-    queue_enqueue(threadsRunning, mainThread);
+    queue_enqueue(threadQueue, mainThread);
 
     // Start the scheduling loop 
-    while(queue_length(threadsRunning) != 0)
+    while(queue_length(threadQueue) != 0)
     {
-        struct uthread_tcb *currentThread = uthread_current();
-        struct uthread_tcb *nextThread;
-
-        // Load the next thread in ready queue
-        int loaded = queue_dequeue(threadsRunning, (void **)&nextThread);
-
-        // there exist thread to yield
-        if (loaded == 0)
-        {
-            // Save the current thread to the ready queue
-            queue_enqueue(threadsRunning, currentThread);
-
-            // Switch the contexts of the old and new thread
-            uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
-        }
+        struct uthread_tcb* prev_thread = currThread;
+        queue_enqueue(threadQueue, currThread);
+        queue_dequeue(threadQueue, (void**)&currThread); // Get next thread into current_thread
+        struct uthread_tcb* next_thread = currThread; // Assign next thread as dequeue'd thread
+        uthread_ctx_switch(&(prev_thread->ctx), &(next_thread->ctx));
     }
 
     // Stop preemption if it was started
@@ -152,8 +142,6 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     }
 
     // Clean up
-    queue_destroy(threadsRunning);
-    queue_destroy(threadsExited);
     free(mainThread);
     
     return SUCC;  // Success
