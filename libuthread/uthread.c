@@ -40,7 +40,9 @@ void uthread_yield(void) {
     // Load the new thred from queue
     vaild = queue_dequeue(readyThreadsQueue, (void **)&currThread);
 
-    if (vaild == SUCC) {
+    // Queue is not empty
+    if (vaild == SUCC) 
+    {
         // Switch the context between old and new thread
         uthread_ctx_switch(&(oldThread->context), &(currThread->context));
     }
@@ -50,10 +52,16 @@ void uthread_exit(void) {
     struct uthread_tcb *prev = uthread_current();
     struct uthread_tcb *next;
 
-    uthread_ctx_destroy_stack(currThread->stack);
-    queue_dequeue(readyThreadsQueue, (void **)&currThread);
-    next = currThread;
-    uthread_ctx_switch(&(prev->context), &(next->context));
+    // Assuming currThread is the currently running thread obtained using uthread_current()
+    if (currThread) {
+        uthread_ctx_destroy_stack(currThread->stack);
+
+        // Dequeue the next thread from the readyThreadsQueue
+        if (queue_dequeue(readyThreadsQueue, (void **)&next) == SUCC) {
+            // Switch from the current thread to the next thread
+            uthread_ctx_switch(&(prev->context), &(next->context));
+        }
+    }
 }
 
 int uthread_create(uthread_func_t func, void *arg) {
