@@ -92,7 +92,7 @@ int uthread_create(uthread_func_t func, void *arg) {
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
-    struct uthread_tcb *idleThread
+    struct uthread_tcb *idleThread;
 
     // Initialize the queue
     readyThreadsQueue = queue_create();
