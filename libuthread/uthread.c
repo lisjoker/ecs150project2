@@ -33,10 +33,17 @@ struct uthread_tcb *uthread_current(void) {
 
 void uthread_yield(void) {
     struct uthread_tcb *oldThread = uthread_current();
+    int vaild;
 
+    // Save the old thread to queue
     queue_enqueue(readyThreadsQueue, oldThread);
-    queue_dequeue(readyThreadsQueue, (void **)&currThread);
-    uthread_ctx_switch(&(oldThread->context), &(currThread->context));
+    // Load the new thred from queue
+    vaild = queue_dequeue(readyThreadsQueue, (void **)&currThread);
+
+    if (vaild == SUCC) {
+        // Switch the context between old and new thread
+        uthread_ctx_switch(&(oldThread->context), &(currThread->context));
+    }
 }
 
 void uthread_exit(void) {
