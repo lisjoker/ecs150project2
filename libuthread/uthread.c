@@ -16,8 +16,6 @@
 #define SUCC 0
 
 queue_t readyThreadsQueue;
-queue_t runningThreadsQueue;
-queue_t exitedThreadsQueue;
 
 struct uthread_tcb *currThread;
 
@@ -92,24 +90,49 @@ int uthread_create(uthread_func_t func, void *arg) {
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
+    	/* TODO Phase 2 */
+    struct uthread_tcb *oldThread;
     struct uthread_tcb *idleThread;
+    int vaild;
 
     // Initialize the queue
     readyThreadsQueue = queue_create();
 
     idleThread = malloc(sizeof(struct uthread_tcb));
     if (idleThread == NULL) {
-        return -1;
+        return ERR;
     }
-    currThread = idleThread;
-    uthread_create(func, arg);
 
-    // printf("here\n");
-    while (queue_length(readyThreadsQueue) > 0) {
-        uthread_yield();
+    vaild = uthread_ctx_init(&(idleThread->context), uthread_ctx_alloc_stack(), func, arg);
+    if (vaild == ERR) 
+    {
+        // Memory allocation failure
+        return ERR;
     }
+
+    // Success creating new thread, add it to ready queue
+    queue_enqueue(readyThreadsQueue, newThread);
+
+    while (queue_length(readyThreadsQueue) > 0) 
+    {
+        oldThread = uthread_current();
+
+        // Save the old thread to queue
+        queue_enqueue(readyThreadsQueue, oldThread);
+        // Load the new thred from queue
+        vaild = queue_dequeue(readyThreadsQueue, (void **)&idleThread);
+
+        // Queue is not empty
+        if (vaild == SUCC) 
+        {
+            // Switch the context between old and new thread
+            uthread_ctx_switch(&(oldThread->context), &(idleThread->context));
+        }
+    }
+
     queue_destroy(readyThreadsQueue);
-    return 0;
+
+    return SUCC;
 }
 
 void uthread_block(void) {
