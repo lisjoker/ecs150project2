@@ -107,11 +107,12 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     //int vaild;
 
     // Set up preemption if preempt is true
+    /*/
     if (preempt) 
     {
         preempt_start(true);
     }
-    
+    */
     mainThread = malloc(sizeof(struct uthread_tcb));
     if (mainThread == NULL) 
     {
@@ -148,11 +149,13 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     }
 
     // Stop preemption if it was started
+    /*/
     if (preempt) 
     {
         preempt_stop();
     }
-    
+    */
+   queue_destroy(threadQueue);
     return SUCC;  // Success
 }
 
