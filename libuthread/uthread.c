@@ -29,7 +29,7 @@ struct uthread_tcb *uthread_current(void)
     if (queue_dequeue(threadQueue, (void **)&currentThread) == 0) {
         // Re-enqueue the current thread to maintain the queue state
         queue_enqueue(threadQueue, currentThread);
-        return threadQueue;
+        return currentThread;
     }
     // No thread is running
     return NULL;
