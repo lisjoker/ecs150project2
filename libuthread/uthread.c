@@ -16,6 +16,8 @@
 #define SUCC 0
 
 queue_t readyThreadsQueue;
+queue_t runningThreadsQueue;
+queue_t exitedThreadsQueue;
 
 struct uthread_tcb *currThread;
 
@@ -107,19 +109,15 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
         // Memory allocation failure
         return ERR;
     }
-
-    // Success creating new thread, add it to ready queue
-    queue_enqueue(readyThreadsQueue, idleThread);
     currThread = idleThread;
+    uthread_create(func, arg);
 
-    while (queue_length(readyThreadsQueue) > 0) 
-    {
+    // printf("here\n");
+    while (queue_length(readyThreadsQueue) > 0) {
         uthread_yield();
     }
-
     queue_destroy(readyThreadsQueue);
-
-    return SUCC;
+    return 0;
 }
 
 void uthread_block(void) {
