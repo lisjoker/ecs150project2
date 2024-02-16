@@ -11,8 +11,8 @@
 #include "queue.h"
 
 // Define return error value.
-#define ERR -1; 
-#define SUCC 0; 
+#define ERR -1
+#define SUCC 0
 
 static queue_t threadQueue; // Global queue to manage all threads
 
@@ -78,7 +78,7 @@ int uthread_create(uthread_func_t func, void *arg)
         return ERR;
     }
 
-    vaild = uthread_ctx_init(&(NewThread->context), uthread_ctx_alloc_stack(), func, arg)
+    vaild = uthread_ctx_init(&(NewThread->context), uthread_ctx_alloc_stack(), func, arg);
     if (vaild == ERR) 
     {
         // Fail to initialize new thread's execution context
