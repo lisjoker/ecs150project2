@@ -129,22 +129,21 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     // Start the scheduling loop 
     while(queue_length(threadsRunning) != 0)
     {
-        struct uthread_tcb *currentThread;
-        vaild = queue_dequeue(threadsRunning, (void **)&currentThread);
-        if (vaild == 0)
+        struct uthread_tcb *currentThread = uthread_current();
+        struct uthread_tcb *nextThread;
+
+        // Load the next thread in ready queue
+        int loaded = queue_dequeue(threadQueue, (void **)&nextThread);
+
+        // there exist thread to yield
+        if (loaded == 0)
         {
-            if (!currentThread->exited) 
-            {
-                queue_enqueue(threadsReady, currentThread);
-                uthread_ctx_switch(&(mainThread->context), &(currentThread->context));
-            } 
-            else 
-            {
-                // Move exited thread to the exited queue
-                queue_enqueue(threadsExited, currentThread);
-            }
+            // Save the current thread to the ready queue
+            queue_enqueue(threadQueue, currentThread);
+
+            // Switch the contexts of the old and new thread
+            uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
         }
-        
     }
 
     // Stop preemption if it was started
