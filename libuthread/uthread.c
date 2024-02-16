@@ -18,7 +18,7 @@
 // static queue_t runningThreads;
 // static queue_t blockedThreads;
 
-// struct uthread_tcb *currentThread;
+struct uthread_tcb *currentThread;
 
 static queue_t threadQueue; // Global queue to manage all threads
 
@@ -31,6 +31,7 @@ struct uthread_tcb {
 struct uthread_tcb *uthread_current(void)
 {
 	/* TODO Phase 2/3 */
+    /*/
 	struct uthread_tcb *currentThread;
     if (queue_dequeue(threadQueue, (void **)&currentThread) == 0) {
         // Re-enqueue the current thread to maintain the queue state
@@ -39,6 +40,8 @@ struct uthread_tcb *uthread_current(void)
     }
     // No thread is running
     return NULL;
+    */
+    return currentThread;
 }
 
 // Save the current thread and load the next thread from ready queue
@@ -47,7 +50,7 @@ void uthread_yield(void)
 	/* TODO Phase 2 */
     struct uthread_tcb *currentThread = uthread_current();
 	struct uthread_tcb *nextThread;
-
+    /*/
     // Load the next thread in ready queue
     int loaded = queue_dequeue(threadQueue, (void **)&nextThread);
 
@@ -60,6 +63,11 @@ void uthread_yield(void)
         // Switch the contexts of the old and new thread
         uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
     }
+    */
+    queue_enqueue(threadQueue, currentThread);
+    queue_dequeue(threadQueue, (void **)&currentThread);
+    nextThread = currentThread;
+    uthread_ctx_switch(&(prev->context), &(nextThread->context));
 }
 
 // Mark the current thread as exited and yield to the next thread
@@ -67,8 +75,13 @@ void uthread_exit(void)
 {
 	/* TODO Phase 2 */
     struct uthread_tcb *currentThread = uthread_current();
-    currentThread->exited = true;
-    uthread_yield();
+    //currentThread->exited = true;
+    //uthread_yield();
+    struct uthread_tcb *next;
+    uthread_ctx_destroy_stack(uthread_ctx_alloc_stack());
+    queue_dequeue(threadQueue, (void **)&currThread);
+    next = currentThread;
+    uthread_ctx_switch(&(currentThread->context), &(next->context));
 }
 
 int uthread_create(uthread_func_t func, void *arg)
@@ -119,8 +132,9 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
         // Memory allocation failure
         return ERR;
     }
-
-    uthread_ctx_init(&(mainThread->context), uthread_ctx_alloc_stack(), func, arg);
+    currentThread = mainThread;
+    uthread_create(func, arg);
+    //uthread_ctx_init(&(mainThread->context), uthread_ctx_alloc_stack(), func, arg);
     //vaild = uthread_ctx_init(&(mainThread->context), uthread_ctx_alloc_stack(), func, arg);
     //if (vaild == ERR) 
     //{
@@ -129,23 +143,13 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     //    return ERR;  
     //}
 
-    mainThread->exited = false;
-    queue_enqueue(threadQueue, mainThread);
+    //mainThread->exited = false;
+    //queue_enqueue(threadQueue, mainThread);
 
     // Start the scheduling loop 
-    while(queue_length(threadQueue) != 0)
+    while(queue_length(threadQueue) > 0)
     {
-        struct uthread_tcb *currentThread = uthread_current();
-        struct uthread_tcb *nextThread;
-
-        // Load the next thread in ready queue
-        queue_dequeue(threadQueue, (void **)&nextThread);
-
-        // Save the current thread to the ready queue
-        queue_enqueue(threadQueue, currentThread);
-
-        // Switch the contexts of the old and new thread
-        uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
+        uthread_yield();
     }
 
     // Stop preemption if it was started
@@ -155,7 +159,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
         preempt_stop();
     }
     */
-   queue_destroy(threadQueue);
+    queue_destroy(threadQueue);
     return SUCC;  // Success
 }
 
