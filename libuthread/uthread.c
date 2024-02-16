@@ -15,8 +15,7 @@
 #define SUCC 0
 
 queue_t ThreadsQueue;
-
-struct uthread_tcb *currThread;
+struct uthread_tcb *currentThread;
 
 struct uthread_tcb {
     uthread_ctx_t context;
@@ -24,40 +23,35 @@ struct uthread_tcb {
 
 struct uthread_tcb *uthread_current(void) {
     /* TODO Phase 2/3 */
-    //return currThread;
-    struct uthread_tcb *current_thread;
-    if (queue_dequeue(ThreadsQueue, (void **)&current_thread) == SUCC) {
-        // Re-enqueue the current thread to maintain the queue state
-        queue_enqueue(ThreadsQueue, current_thread);
-        return current_thread;
-    }
-    return NULL;
+    return currentThread;
 }
 
 void uthread_yield(void) {
+    /* TODO Phase 2 */
     struct uthread_tcb *oldThread = uthread_current();
     int vaild;
 
     // Save the old thread to queue
     queue_enqueue(ThreadsQueue, oldThread);
     // Load the new thred from queue
-    vaild = queue_dequeue(ThreadsQueue, (void **)&currThread);
+    vaild = queue_dequeue(ThreadsQueue, (void **)&currentThread);
 
     // Queue is not empty
     if (vaild == SUCC) 
     {
         // Switch the context between old and new thread
-        uthread_ctx_switch(&(oldThread->context), &(currThread->context));
+        uthread_ctx_switch(&(oldThread->context), &(currentThread->context));
     }
 }
 
 // Like the yield function but without enqueue. 
 void uthread_exit(void) {
+    /* TODO Phase 2 */
     struct uthread_tcb *oldThread = uthread_current();
     int vaild;
 
     // Remove the thread from the queue
-    vaild = queue_dequeue(ThreadsQueue, (void **)&currThread);
+    vaild = queue_dequeue(ThreadsQueue, (void **)&currentThread);
 
     // Queue is not empty
     if (vaild == SUCC)
@@ -66,11 +60,12 @@ void uthread_exit(void) {
         uthread_ctx_destroy_stack(uthread_ctx_alloc_stack());
 
         // Remove the context of that thread
-        uthread_ctx_switch(&(oldThread->context), &(currThread->context));
+        uthread_ctx_switch(&(oldThread->context), &(currentThread->context));
     }
 }
 
 int uthread_create(uthread_func_t func, void *arg) {
+    /* TODO Phase 2 */
     struct uthread_tcb *newThread; 
     int vaild;
 
@@ -95,6 +90,7 @@ int uthread_create(uthread_func_t func, void *arg) {
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
+    /* TODO Phase 2 */
     struct uthread_tcb *idleThread;
     struct uthread_tcb *oldThread, *newThread;
     int vaild1, vaild2;
@@ -121,7 +117,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     // Success creating new thread, add it to ready queue
     queue_enqueue(ThreadsQueue, newThread);
 
-    currThread = idleThread;
+    currentThread = idleThread;
     while (queue_length(ThreadsQueue) > 0) 
     {
         oldThread = uthread_current();
@@ -129,9 +125,9 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
         // Save the old thread to queue
         queue_enqueue(ThreadsQueue, oldThread);
         // Load the new thred from queue
-        queue_dequeue(ThreadsQueue, (void **)&currThread);
+        queue_dequeue(ThreadsQueue, (void **)&currentThread);
         // Switch the context between old and new thread
-        uthread_ctx_switch(&(oldThread->context), &(currThread->context));
+        uthread_ctx_switch(&(oldThread->context), &(currentThread->context));
     }
     queue_destroy(ThreadsQueue);
     return SUCC;
