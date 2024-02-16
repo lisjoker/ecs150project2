@@ -1,4 +1,5 @@
 #include "uthread.h"
+
 #include <assert.h>
 #include <signal.h>
 #include <stddef.h>
@@ -89,8 +90,6 @@ int uthread_create(uthread_func_t func, void *arg) {
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
-    	/* TODO Phase 2 */
-    struct uthread_tcb *oldThread;
     struct uthread_tcb *idleThread;
     int vaild;
 
@@ -111,22 +110,11 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
 
     // Success creating new thread, add it to ready queue
     queue_enqueue(readyThreadsQueue, idleThread);
+    currThread = idleThread;
 
     while (queue_length(readyThreadsQueue) > 0) 
     {
-        oldThread = uthread_current();
-
-        // Save the old thread to queue
-        queue_enqueue(readyThreadsQueue, oldThread);
-        // Load the new thred from queue
-        vaild = queue_dequeue(readyThreadsQueue, (void **)&idleThread);
-
-        // Queue is not empty
-        if (vaild == SUCC) 
-        {
-            // Switch the context between old and new thread
-            uthread_ctx_switch(&(oldThread->context), &(idleThread->context));
-        }
+        uthread_yield();
     }
 
     queue_destroy(readyThreadsQueue);
