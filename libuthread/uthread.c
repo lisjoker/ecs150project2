@@ -52,16 +52,10 @@ void uthread_exit(void) {
     struct uthread_tcb *prev = uthread_current();
     struct uthread_tcb *next;
 
-    // Assuming currThread is the currently running thread obtained using uthread_current()
-    if (currThread) {
-        uthread_ctx_destroy_stack(currThread->stack);
-
-        // Dequeue the next thread from the readyThreadsQueue
-        if (queue_dequeue(readyThreadsQueue, (void **)&next) == SUCC) {
-            // Switch from the current thread to the next thread
-            uthread_ctx_switch(&(prev->context), &(next->context));
-        }
-    }
+    uthread_ctx_destroy_stack(currThread->stack);
+    queue_dequeue(readyThreadsQueue, (void **)&currThread);
+    next = currThread;
+    uthread_ctx_switch(&(prev->context), &(next->context));
 }
 
 int uthread_create(uthread_func_t func, void *arg) {
