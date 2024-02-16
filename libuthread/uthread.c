@@ -132,7 +132,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
         queue_enqueue(threadQueue, currThread);
         queue_dequeue(threadQueue, (void**)&currThread); // Get next thread into current_thread
         struct uthread_tcb* next_thread = currThread; // Assign next thread as dequeue'd thread
-        uthread_ctx_switch(&(prev_thread->ctx), &(next_thread->ctx));
+        uthread_ctx_switch(&(prev_thread->context), &(next_thread->context));
     }
 
     // Stop preemption if it was started
