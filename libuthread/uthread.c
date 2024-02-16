@@ -15,9 +15,9 @@
 #define ERR -1
 #define SUCC 0
 
-queue_t readyThreads;
-queue_t runningThreads;
-queue_t exitedThreads;
+queue_t readyThreadsQueue;
+queue_t runningThreadsQueue;
+queue_t exitedThreadsQueue;
 
 struct uthread_tcb *currThread;
 
@@ -27,22 +27,16 @@ struct uthread_tcb {
 };
 
 struct uthread_tcb *uthread_current(void) {
+    /* TODO Phase 2/3 */
     return currThread;
 }
 
 void uthread_yield(void) {
-    /*
     struct uthread_tcb *oldThread = uthread_current();
 
-    queue_enqueue(readyThreads, currThread);
-    queue_dequeue(readyThreads, (void **)&currThread);
+    queue_enqueue(readyThreadsQueue, oldThread);
+    queue_dequeue(readyThreadsQueue, (void **)&currThread);
     uthread_ctx_switch(&(oldThread->context), &(currThread->context));
-    */
-    struct uthread_tcb *nextThread;
-    queue_enqueue(readyThreads, currThread);
-    queue_dequeue(readyThreads, (void **)&nextThread);
-    uthread_ctx_switch(&(currThread->context), &(nextThread->context));
-    currThread = nextThread;
 }
 
 void uthread_exit(void) {
@@ -50,7 +44,7 @@ void uthread_exit(void) {
     struct uthread_tcb *next;
 
     uthread_ctx_destroy_stack(currThread->stack);
-    queue_dequeue(readyThreads, (void **)&currThread);
+    queue_dequeue(readyThreadsQueue, (void **)&currThread);
     next = currThread;
     uthread_ctx_switch(&(prev->context), &(next->context));
 }
@@ -70,13 +64,13 @@ int uthread_create(uthread_func_t func, void *arg) {
         -1) {
         return -1;
     }
-    queue_enqueue(readyThreads, newThread);
+    queue_enqueue(readyThreadsQueue, newThread);
 
     return 0;
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
-    readyThreads = queue_create();
+    readyThreadsQueue = queue_create();
     struct uthread_tcb *idleThread = malloc(sizeof(struct uthread_tcb));
     if (idleThread == NULL) {
         return -1;
@@ -85,14 +79,10 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     uthread_create(func, arg);
 
     // printf("here\n");
-    while (queue_length(readyThreads) > 0) {
-        // printf("here2\n");
-        // printf("%d\n", queue_length(readyThreads));
+    while (queue_length(readyThreadsQueue) > 0) {
         uthread_yield();
-        // printf("here3\n");
     }
-    // printf("done\n");
-    queue_destroy(readyThreads);
+    queue_destroy(readyThreadsQueue);
     return 0;
 }
 
