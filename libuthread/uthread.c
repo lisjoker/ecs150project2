@@ -91,35 +91,23 @@ int uthread_create(uthread_func_t func, void *arg) {
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     struct uthread_tcb *idleThread;
     struct uthread_tcb *oldThread;
-    //queue_t runQueue;
-    int vaild;
+    struct uthread_tcb *newThread; 
+    int vaild1, vaild2;
 
     // Initialize the queue
     ThreadsQueue = queue_create();
 
     idleThread = malloc(sizeof(struct uthread_tcb));
-    if (idleThread == NULL) {
-        return ERR;
-    }
-
-    vaild = uthread_ctx_init(&(idleThread->context), uthread_ctx_alloc_stack(), func, arg);
-    if (vaild == ERR) 
-    {
-        // Memory allocation failure
-        return ERR;
-    }
-
-    struct uthread_tcb *newThread; 
-
     newThread = malloc(sizeof(struct uthread_tcb));
-    if (newThread == NULL) 
+    if ((idleThread == NULL) || (newThread == NULL)) 
     {
-        // Fail to create new thread
+        // fail to create thread
         return ERR;
     }
 
-    vaild = uthread_ctx_init(&(newThread->context), uthread_ctx_alloc_stack(), func, arg);
-    if (vaild == ERR) 
+    vaild1 = uthread_ctx_init(&(idleThread->context), uthread_ctx_alloc_stack(), func, arg);
+    vaild2 = uthread_ctx_init(&(newThread->context), uthread_ctx_alloc_stack(), func, arg);
+    if (vaild1 == ERR || vaild2 == ERR) 
     {
         // Memory allocation failure
         return ERR;
