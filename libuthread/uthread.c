@@ -14,17 +14,18 @@
 #define ERR -1
 #define SUCC 0
 
-static queue_t readyThreads;
-static queue_t runningThreads;
-static queue_t exitedThreads;
+//static queue_t readyThreads;
+//static queue_t runningThreads;
+//static queue_t exitedThreads;
 
 static queue_t threadQueue;
 
-struct uthread_tcb *currentThread;
+//struct uthread_tcb *currentThread;
 
 struct uthread_tcb {
 	uthread_ctx_t context;      // Execution context
     void *stack;
+    bool exited;
 };
 
 struct uthread_tcb *uthread_current(void)
