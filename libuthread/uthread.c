@@ -97,7 +97,6 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	/* TODO Phase 2 */
     threadQueue = queue_create();
-    struct uthread_tcb *currThread = uthread_current();
     struct uthread_tcb *mainThread;
     int vaild;
 
@@ -126,13 +125,9 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     queue_enqueue(threadQueue, mainThread);
 
     // Start the scheduling loop 
-    while(queue_length(threadQueue) != 0)
+    while(queue_length(threadQueue) > 1)
     {
-        struct uthread_tcb* prev_thread = currThread;
-        queue_enqueue(threadQueue, currThread);
-        queue_dequeue(threadQueue, (void**)&currThread); // Get next thread into current_thread
-        struct uthread_tcb* next_thread = currThread; // Assign next thread as dequeue'd thread
-        uthread_ctx_switch(&(prev_thread->context), &(next_thread->context));
+        uthread_yield();
     }
 
     // Stop preemption if it was started
@@ -140,9 +135,6 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     {
         preempt_stop();
     }
-
-    // Clean up
-    free(mainThread);
     
     return SUCC;  // Success
 }
