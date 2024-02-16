@@ -99,20 +99,14 @@ int uthread_create(uthread_func_t func, void *arg)
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
-	/* TODO Phase 2 
+	/* TODO Phase 2 */
     queue_t threadsRunning = queue_create();
     queue_t threadsExited = queue_create();
     struct uthread_tcb *mainThread;
     struct uthread_tcb *currentThread;
     int vaild;
-
-    // Set up preemption if preempt is true
-    if (preempt) 
-    {
-        preempt_start(true);
-    }
     
-    mainThread = (struct uthread_tcb *)malloc(sizeof(struct uthread_tcb));
+    mainThread = malloc(sizeof(struct uthread_tcb));
     if (!mainThread) 
     {
         // Memory allocation failure
@@ -130,11 +124,18 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     mainThread->exited = false;
     queue_enqueue(threadsRunning, mainThread);
 
-    // Start the scheduling loop
-    while(queue_dequeue(threadsRunning, (void **)&currentThread) == 0  || queue_length(threadsRunning) > 0) 
+    // Set up preemption if preempt is true
+    if (preempt) 
+    {
+        preempt_start(true);
+    }
+
+    // Start the scheduling loop 
+    while(queue_dequeue(threadsRunning, (void **)&currentThread) == 0  || queue_length(threadsRunning) != 0) 
     {
         if (!currentThread->exited) 
         {
+            currentThread->exited = true;
             queue_enqueue(threadsRunning, currentThread);
             uthread_ctx_switch(&(mainThread->context), &(currentThread->context));
         } 
@@ -154,7 +155,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     queue_destroy(threadsRunning);
     queue_destroy(threadsExited);
     free(mainThread);
-    */
+    
     return SUCC;  // Success
 }
 
@@ -174,3 +175,4 @@ void uthread_unblock(struct uthread_tcb *uthread)
         queue_enqueue(threadQueue, uthread);
     }
 }
+
