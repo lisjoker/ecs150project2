@@ -1,5 +1,4 @@
 #include "uthread.h"
-
 #include <assert.h>
 #include <signal.h>
 #include <stddef.h>
@@ -111,7 +110,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     }
 
     // Success creating new thread, add it to ready queue
-    queue_enqueue(readyThreadsQueue, newThread);
+    queue_enqueue(readyThreadsQueue, idleThread);
 
     while (queue_length(readyThreadsQueue) > 0) 
     {
