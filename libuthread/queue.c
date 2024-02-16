@@ -4,20 +4,23 @@
 #include "queue.h"
 
 // define success value
-#define SUCC 0; 
-// define error value.
-#define ERR -1; 
+#define SUCC 0
+// Define error value.
+#define ERR -1
 
 struct queue {
 	/* TODO Phase 1 */
-	struct Node {
+	struct Node 
+    {
 		// pointer to the next element
-        struct Node *next;
+        struct Node *nextNode;
 		// pointer to the current element
         void *data;
-    } * front, *rear;
-	// front points to the first element in the linked structure
+    } 
+
+    // front points to the first element in the linked structure
 	// rear points to the last element in the linked structure
+    struct Node *front, *end;
     int size;
 };
 
@@ -25,13 +28,14 @@ queue_t queue_create(void)
 {
 	/* TODO Phase 1 */
 	struct queue* new_queue = malloc(sizeof(struct queue));
-    if (!new_queue) {
+    if (new_queue == NULL) 
+    {
         // Handle memory allocation failure
         return NULL;
     }
 
 	new_queue->front = NULL;
-    new_queue->rear = NULL;
+    new_queue->end = NULL;
     new_queue->size = 0;
 
     return new_queue;
@@ -40,7 +44,8 @@ queue_t queue_create(void)
 int queue_destroy(queue_t queue)
 {
 	/* TODO Phase 1 */
-	if (!queue || queue->size != 0) {
+	if (queue == NULL || queue->size != 0) 
+    {
         // Queue is NULL or not empty, cannot destroy
         return ERR;
     }
@@ -52,130 +57,151 @@ int queue_destroy(queue_t queue)
 int queue_enqueue(queue_t queue, void *data)
 {
 	/* TODO Phase 1 */
-	if (!queue || !data) {
+	if (queue == NULL || data == NULL) 
+    {
         // Invalid parameters
         return ERR;
     }
 
     struct Node *new_node = (struct Node *)malloc(sizeof(struct Node));
-    if (!new_node) {
+    if (new_node == NULL) 
+    {
         // Handle memory allocation failure
         return ERR;
     }
 
+    // Initialize the new node
 	new_node->data = data;
-    new_node->next = NULL;
+    new_node->nextNode = NULL;
 
-	if (queue->rear == 0) {
-        // Queue is empty
+	if (queue->end == NULL || queue->size == 0) 
+    {
+        // Queue is empty, front asnd end points to the same address
         queue->front = new_node;
-        queue->rear = new_node;
-    } else {
-        // Add to the end of the queue
-        queue->rear->next = new_node;
-        queue->rear = new_node;
+        queue->end = new_node;
+    } 
+    else 
+    {
+        // Add the new node to the end of the queue
+        queue->end->nextNode = new_node;    // connects the new node to the existing last node
+        queue->end = new_node;      // updates the end pointer to point to the new node
     }
 
     queue->size++;
+    // New node added successgully
     return SUCC;
 }
 
 int queue_dequeue(queue_t queue, void **data)
 {
 	/* TODO Phase 1 */
-    if (!queue || !data || queue->size == 0) {
+    if (queue == NULL || data == NULL || queue->size == 0) 
+    {
         // Invalid parameters or empty queue
         return ERR;
     }
 
-    struct Node *temp = queue->front;
-    *data = temp->data;
-
-    queue->front = temp->next;
-    free(temp);
-
-    if (queue->front == NULL) {
-        // Queue is now empty
-        queue->rear = NULL;
-    }
+    // Data stores the first thing in queue
+    *data = queue->data;
+    // Relocate the queue's first element to the second element
+    queue->front = queue->nextNode;
 
     queue->size--;
+
+    // Check if queue still contains elements
+    if (queue->size == 0) 
+    {
+        // Queue now is empty
+        queue->front = NULL;
+        queue->end = NULL;
+    }
+
     return SUCC;
 }
 
+// Delete data from the queue
 int queue_delete(queue_t queue, void *data)
 {
 	/* TODO Phase 1 */
-    if (!queue || !data || queue->size == 0) {
-        // Invalid parameters
+    if (queue == NULL || data == NULL || queue->size == 0) 
+    {
+        // Invalid parameters or quque is empty
         return ERR;
     }
 
     struct Node *current = queue->front;
     struct Node *previous = NULL;
 
-    while (current != NULL) {
-        if (current->data == data) {
+    while (current != NULL) 
+    {
+        // Checking for match
+        if (current->data == data) 
+        {
             // Found the data, remove it from the queue
-            if (previous == NULL) {
+            if (previous == NULL) 
+            {
                 // Deleting the front node
-                queue->front = current->next;
-                free(current);
+                queue->front = current->nextNode;
 
-                if (queue->front == NULL) {
+                if (queue->front == NULL) 
+                {
                     // Queue is now empty
-                    queue->rear = NULL;
+                    queue->end = NULL;
                 }
-            } else {
+            } 
+            else 
+            {
                 // Deleting a node in the middle or end
-                previous->next = current->next;
-                free(current);
+                previous->nextNode = current->nextNode;
 
-                if (previous->next == NULL) {
-                    // Deleted the last node, update rear
-                    queue->rear = previous;
+                if (previous->nextNode == NULL) 
+                {
+                    // Deleted the last node, update end
+                    queue->end = previous;
                 }
             }
-
+            free(current);
             queue->size--;
             return SUCC;
         }
 
+        // Update current node
         previous = current;
-        current = current->next;
+        current = current->nextNode;
     }
 
     // Data not found in the queue
     return ERR;
 }
 
-int queue_iterate(queue_t queue, queue_func_t func) {
-	if(queue == NULL || func == NULL || queue->size == 0){
+int queue_iterate(queue_t queue, queue_func_t func)
+{
+	/* TODO Phase 1 */
+    if (!queue || !func || queue->size == 0) 
+    {
+        // Invalid parameters
         return ERR;
     }
-    // iterate from head of the queue
-    struct Node* current = queue->front;
-    struct Node* temp = malloc(sizeof(struct Node));
-    while(current != NULL){
-        // go through each node in the queue
-        temp = current;
-        current = current->next;
-        // do function for each node
-        func(temp->data);
+
+    struct Node *current = queue->front;
+    while (current != NULL) 
+    {
+        // Call the provided function on each data item
+        func(queue, current->data);
+        current = current->nextNode;
     }
-    temp = NULL;
-    free(temp);
+
     return SUCC;
 }
 
 int queue_length(queue_t queue)
 {
 	/* TODO Phase 1 */
-    if (!queue) {
+    if (!queue) 
+    {
         // Invalid parameter
         return ERR;
     }
 
     return queue->size;
 }
-
