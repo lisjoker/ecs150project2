@@ -19,7 +19,6 @@ static queue_t threadQueue; // Global queue to manage all threads
 struct uthread_tcb {
 	uthread_ctx_t context;      // Execution context
     bool exited;           // Flag indicating whether the thread has exited
-
     void *stack;
 };
 
@@ -42,7 +41,6 @@ void uthread_yield(void)
 	/* TODO Phase 2 */
     struct uthread_tcb *currentThread = uthread_current();
 	struct uthread_tcb *nextThread;
-    printf("here1\n");
 
     // Load the next thread in ready queue
     int loaded = queue_dequeue(threadQueue, (void **)&nextThread);
@@ -62,7 +60,6 @@ void uthread_yield(void)
 void uthread_exit(void)
 {
 	/* TODO Phase 2 */
-    printf("here2\n");
     struct uthread_tcb *currentThread = uthread_current();
     currentThread->exited = true;
     uthread_yield();
@@ -71,7 +68,6 @@ void uthread_exit(void)
 int uthread_create(uthread_func_t func, void *arg)
 {
 	/* TODO Phase 2 */
-    printf("here3\n");
     int vaild;
     struct uthread_tcb* NewThread;
 
@@ -97,12 +93,11 @@ int uthread_create(uthread_func_t func, void *arg)
     return SUCC;
 }
 
-queue_t threadsRunning = queue_create();
-queue_t threadsExited = queue_create();
-
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	/* TODO Phase 2 */
+    queue_t threadsRunning = queue_create();
+    queue_t threadsExited = queue_create();
     struct uthread_tcb *mainThread;
     struct uthread_tcb *currentThread;
     int vaild;
@@ -132,7 +127,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     queue_enqueue(threadsRunning, mainThread);
 
     // Start the scheduling loop 
-    while(queue_dequeue(threadsRunning, (void **)&currentThread) == 0  || queue_length(threadsRunning) != 0) 
+    while(queue_dequeue(threadsRunning, (void **)&currentThread) == 0 || queue_length(threadsRunning) != 0)
     {
         if (!currentThread->exited) 
         {
@@ -147,13 +142,14 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     }
 
     // Stop preemption if it was started
-    if (preempt) {
+    if (preempt) 
+    {
         preempt_stop();
     }
 
     // Clean up
-    //queue_destroy(threadsRunning);
-    //queue_destroy(threadsExited);
+    queue_destroy(threadsRunning);
+    queue_destroy(threadsExited);
     free(mainThread);
     
     return SUCC;  // Success
