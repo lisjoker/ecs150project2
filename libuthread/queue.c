@@ -66,7 +66,7 @@ int queue_enqueue(queue_t queue, void *data)
 	new_node->data = data;
     new_node->next = NULL;
 
-	if (queue->size == NULL) {
+	if (queue->rear == 0) {
         // Queue is empty
         queue->front = new_node;
         queue->rear = new_node;
@@ -103,67 +103,68 @@ int queue_dequeue(queue_t queue, void **data)
     return SUCC;
 }
 
-int queue_delete(queue_t queue, void *data) {
-	// queue ore data are NULL
-    if(queue == NULL || data == NULL || queue->size == 0){
-        return ERR;
-    }
-    int found = 0;
-    int queueLen = queue->size;
-    struct Node* previous = malloc(sizeof(struct Node));
-    struct Node* current = queue->front;
-    previous = NULL;
-    for(int i = 0; i < queueLen; i++){
-        if(current->data == data){
-            found = 1;
-            // goal data is the head of the queue
-            if(i == 0){
-                if(queue->size == 1){ // only one element in the queue
-                    queue->size--;
-                    queue->front = NULL;
-                    queue->rear = NULL;
-                    free(current); // deallocate the goal data in queue
-
-                } else if(queue->size > 1) { // more than one elements in the queue
-                    queue->size--;
-
-                    current = queue->front->next;// deallocate the goal data in queueQ
-                    queue->front = NULL;
-                    queue->front = current;
-                }
-            } else { // goal data is not the head of the queue
-                queue->size--;
-                previous->next = current->next;
-                free(current); // deallocate the goal data in queue
-            }
-            break; // only delete the first match one
-        } else { // goal data not found
-            previous = current;
-            current = current->next;
-            previous->next = current;
-        }
-    }
-    if(found == 0){ // data was not found
-        return ERR;
-    }
-    return SUCC;
-}
-
-int queue_iterate(queue_t queue, queue_func_t func)
+int queue_delete(queue_t queue, void *data)
 {
 	/* TODO Phase 1 */
-    if (!queue || !func || queue->size == 0) {
+    if (!queue || !data || queue->size == 0) {
         // Invalid parameters
         return ERR;
     }
 
     struct Node *current = queue->front;
+    struct Node *previous = NULL;
+
     while (current != NULL) {
-        // Call the provided function on each data item
-        func(queue, current->data);
+        if (current->data == data) {
+            // Found the data, remove it from the queue
+            if (previous == NULL) {
+                // Deleting the front node
+                queue->front = current->next;
+                free(current);
+
+                if (queue->front == NULL) {
+                    // Queue is now empty
+                    queue->rear = NULL;
+                }
+            } else {
+                // Deleting a node in the middle or end
+                previous->next = current->next;
+                free(current);
+
+                if (previous->next == NULL) {
+                    // Deleted the last node, update rear
+                    queue->rear = previous;
+                }
+            }
+
+            queue->size--;
+            return SUCC;
+        }
+
+        previous = current;
         current = current->next;
     }
 
+    // Data not found in the queue
+    return ERR;
+}
+
+int queue_iterate(queue_t queue, queue_func_t func) {
+	if(queue == NULL || func == NULL || queue->size == 0){
+        return ERR;
+    }
+    // iterate from head of the queue
+    struct Node* current = queue->front;
+    struct Node* temp = malloc(sizeof(struct Node));
+    while(current != NULL){
+        // go through each node in the queue
+        temp = current;
+        current = current->next;
+        // do function for each node
+        func(temp->data);
+    }
+    temp = NULL;
+    free(temp);
     return SUCC;
 }
 
