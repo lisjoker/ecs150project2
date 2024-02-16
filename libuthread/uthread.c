@@ -51,16 +51,20 @@ void uthread_yield(void) {
 // Like the yield function but without enqueue. 
 void uthread_exit(void) {
     struct uthread_tcb *oldThread = uthread_current();
+    int vaild;
 
     // Remove the thread from the queue
-    queue_dequeue(readyThreadsQueue, (void **)&currThread);
+    vaild = queue_dequeue(readyThreadsQueue, (void **)&currThread);
 
-    // Destroy the stack of that thread
-    uthread_ctx_destroy_stack(uthread_ctx_alloc_stack());
+    // Queue is not empty
+    if (vaild)
+    {
+        // Destroy the stack of that thread
+        uthread_ctx_destroy_stack(uthread_ctx_alloc_stack());
 
-    // Remove the context of that thread
-    uthread_ctx_switch(&(oldThread->context), &(currThread->context));
-
+        // Remove the context of that thread
+        uthread_ctx_switch(&(oldThread->context), &(currThread->context));
+    }
 }
 
 int uthread_create(uthread_func_t func, void *arg) {
