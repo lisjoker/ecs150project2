@@ -1,16 +1,19 @@
 # Target library
+objs := queue.o uthread.o context.o private.o sem.o preempt.o
 lib := libuthread.a
-
+CC := gcc
+CFLAGS := -Wall -Werror
 all: $(lib)
 
-## TODO: Phase 1
-$(lib): queue.o uthread.o 
-	ar rcs $(lib) queue.o uthread.o 
 
-queue.o: queue.c 
-	gcc  -Wall -Werror -c queue.c -o queue.o
+$(lib): queue.o uthread.o context.o private.o preempt.o
+	ar rcs $(lib) queue.o uthread.o context.o private.o preempt.o
 
-uthread.o: uthread.c
-	gcc -Wall -Werror -c uthread.c -o uthread.o
-	
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
+private.o: private.h
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f $(lib) $(objs)
