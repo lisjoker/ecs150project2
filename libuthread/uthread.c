@@ -127,7 +127,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     queue_enqueue(threadsRunning, mainThread);
 
     // Start the scheduling loop
-    while (queue_dequeue(threadsRunning, (void **)&currentThread) == 0) 
+    while(queue_dequeue(threadsRunning, (void **)&currentThread) == 0  || queue_length(threadsRunning) > 0) 
     {
         if (!currentThread->exited) 
         {
@@ -158,9 +158,9 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 void uthread_block(void)
 {
 	/* TODO Phase 3 */
-    struct uthread_tcb *currentThread = uthread_current();
-    currentThread->exited = true;
-    uthread_yield();
+    //struct uthread_tcb *currentThread = uthread_current();
+    //currentThread->exited = true;
+    //uthread_yield();
 }
 
 void uthread_unblock(struct uthread_tcb *uthread)
