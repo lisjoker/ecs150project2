@@ -154,9 +154,8 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     queue_destroy(threadsRunning);
     queue_destroy(threadsExited);
     free(mainThread);
-
+    */
     return SUCC;  // Success
-	*/
 }
 
 void uthread_block(void)
