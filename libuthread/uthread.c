@@ -16,15 +16,19 @@
 
 static queue_t threadQueue; // Global queue to manage all threads
 
+struct uthread_tcb *currThread;
+queue_t readyThreads;
+
 struct uthread_tcb {
-    void *stack;                // Stack pointer
 	uthread_ctx_t context;      // Execution context
     bool exited;           // Flag indicating whether the thread has exited
+
+    void *stack;
 };
 
 struct uthread_tcb *uthread_current(void)
 {
-	/* TODO Phase 2/3 */
+	/* TODO Phase 2/3 
 	struct uthread_tcb *currentThread;
     if (queue_dequeue(threadQueue, (void **)&currentThread) == 0) {
         // Re-enqueue the current thread to maintain the queue state
@@ -33,6 +37,8 @@ struct uthread_tcb *uthread_current(void)
     }
     // No thread is running
     return NULL;
+    */
+    return currThread
 }
 
 // Save the current thread and load the next thread from ready queue
