@@ -14,24 +14,23 @@
 #define ERR -1
 #define SUCC 0
 
-//static queue_t readyThreads;
-//static queue_t runningThreads;
-//static queue_t exitedThreads;
+// static queue_t readyThreads;
+// static queue_t runningThreads;
+// static queue_t blockedThreads;
 
-static queue_t threadQueue;
+// struct uthread_tcb *currentThread;
 
-//struct uthread_tcb *currentThread;
+static queue_t threadQueue; // Global queue to manage all threads
 
 struct uthread_tcb {
 	uthread_ctx_t context;      // Execution context
+    bool exited;           // Flag indicating whether the thread has exited
     void *stack;
-    bool exited;
 };
 
 struct uthread_tcb *uthread_current(void)
 {
 	/* TODO Phase 2/3 */
-    
 	struct uthread_tcb *currentThread;
     if (queue_dequeue(threadQueue, (void **)&currentThread) == 0) {
         // Re-enqueue the current thread to maintain the queue state
@@ -40,8 +39,6 @@ struct uthread_tcb *uthread_current(void)
     }
     // No thread is running
     return NULL;
-    
-    //return currentThread;
 }
 
 // Save the current thread and load the next thread from ready queue
@@ -110,10 +107,10 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     //int vaild;
 
     // Set up preemption if preempt is true
-    //if (preempt) 
-    //{
-    preempt_start(true);
-    //}
+    if (preempt) 
+    {
+        preempt_start(true);
+    }
     
     mainThread = malloc(sizeof(struct uthread_tcb));
     if (mainThread == NULL) 
@@ -143,19 +140,18 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
         // Load the next thread in ready queue
         queue_dequeue(threadQueue, (void **)&nextThread);
 
-            // Save the current thread to the ready queue
+        // Save the current thread to the ready queue
         queue_enqueue(threadQueue, currentThread);
 
-            // Switch the contexts of the old and new thread
+        // Switch the contexts of the old and new thread
         uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
-        
     }
 
     // Stop preemption if it was started
-    //if (preempt) 
-    //{
-    preempt_stop();
-    //}
+    if (preempt) 
+    {
+        preempt_stop();
+    }
     
     return SUCC;  // Success
 }
