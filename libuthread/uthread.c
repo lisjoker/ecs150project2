@@ -133,7 +133,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     queue_enqueue(threadQueue, mainThread);
 
     // Start the scheduling loop 
-    while(queue_length(threadQueue) > 1)
+    while(queue_length(threadQueue) != 0)
     {
         struct uthread_tcb *currentThread = uthread_current();
         struct uthread_tcb *nextThread;
