@@ -91,7 +91,7 @@ int uthread_create(uthread_func_t func, void *arg) {
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     struct uthread_tcb *idleThread;
     struct uthread_tcb *oldThread;
-    //struct uthread_tcb *temp;
+    struct uthread_tcb *temp;
     //queue_t runQueue;
     int vaild;
 
@@ -111,7 +111,8 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     }
 
     //uthread_create(func, arg);
-    queue_enqueue(ThreadsQueue, idleThread);
+    temp = idleThread;
+    queue_enqueue(ThreadsQueue, temp);
 
     currThread = idleThread;
     while (queue_length(ThreadsQueue) > 0) {
