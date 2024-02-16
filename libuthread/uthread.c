@@ -78,7 +78,7 @@ int uthread_create(uthread_func_t func, void *arg) {
         return ERR;
     }
 
-    vaild = uthread_ctx_init(&(newThread->context), uthread_ctx_alloc_stack(), func, arg)
+    vaild = uthread_ctx_init(&(newThread->context), uthread_ctx_alloc_stack(), func, arg);
     if (vaild == ERR) 
     {
         // Memory allocation failure
@@ -93,7 +93,7 @@ int uthread_create(uthread_func_t func, void *arg) {
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     struct uthread_tcb *idleThread
-    
+
     // Initialize the queue
     readyThreadsQueue = queue_create();
 
