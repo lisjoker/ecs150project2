@@ -96,7 +96,6 @@ int uthread_create(uthread_func_t func, void *arg)
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	/* TODO Phase 2 */
-    queue_t threadsReady = queue_create();
     queue_t threadsRunning = queue_create();
     queue_t threadsExited = queue_create();
     struct uthread_tcb *mainThread;
