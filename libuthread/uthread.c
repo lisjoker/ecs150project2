@@ -48,14 +48,18 @@ void uthread_yield(void) {
     }
 }
 
+// Like the yield function but without enqueue. 
 void uthread_exit(void) {
-    struct uthread_tcb *prev = uthread_current();
-    struct uthread_tcb *next;
+    struct uthread_tcb *oldThread = uthread_current();
 
-    uthread_ctx_destroy_stack(uthread_ctx_alloc_stack());
+    // Remove the thread from the queue
     queue_dequeue(readyThreadsQueue, (void **)&currThread);
-    next = currThread;
-    uthread_ctx_switch(&(prev->context), &(next->context));
+
+    // Destroy the stack of that thread
+    uthread_ctx_destroy_stack(uthread_ctx_alloc_stack());
+
+    // Remove the context of that thread
+    uthread_ctx_switch(&(oldThread->context), &(currThread->context));
 
 }
 
