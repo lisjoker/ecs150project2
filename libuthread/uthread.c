@@ -38,7 +38,7 @@ struct uthread_tcb *uthread_current(void)
     // No thread is running
     return NULL;
     */
-    return currThread
+    return currThread;
 }
 
 // Save the current thread and load the next thread from ready queue
