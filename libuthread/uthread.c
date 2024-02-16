@@ -27,7 +27,6 @@ struct uthread_tcb *uthread_current(void)
 {
 	/* TODO Phase 2/3 */
 	struct uthread_tcb *currentThread;
-    printf("here1\n");
     if (queue_dequeue(threadQueue, (void **)&currentThread) == 0) {
         // Re-enqueue the current thread to maintain the queue state
         queue_enqueue(threadQueue, currentThread);
@@ -43,6 +42,7 @@ void uthread_yield(void)
 	/* TODO Phase 2 */
     struct uthread_tcb *currentThread = uthread_current();
 	struct uthread_tcb *nextThread;
+    printf("here1\n");
 
     // Load the next thread in ready queue
     int loaded = queue_dequeue(threadQueue, (void **)&nextThread);
@@ -62,6 +62,7 @@ void uthread_yield(void)
 void uthread_exit(void)
 {
 	/* TODO Phase 2 */
+    printf("here2\n");
     struct uthread_tcb *currentThread = uthread_current();
     currentThread->exited = true;
     uthread_yield();
@@ -70,6 +71,7 @@ void uthread_exit(void)
 int uthread_create(uthread_func_t func, void *arg)
 {
 	/* TODO Phase 2 */
+    printf("here3\n");
     int vaild;
     struct uthread_tcb* NewThread;
 
@@ -98,6 +100,7 @@ int uthread_create(uthread_func_t func, void *arg)
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	/* TODO Phase 2 */ 
+    printf("here4\n");
     queue_t threadsRunning = queue_create();
     queue_t threadsExited = queue_create();
     struct uthread_tcb *mainThread;
@@ -160,6 +163,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 void uthread_block(void)
 {
 	/* TODO Phase 3 */
+    printf("here5\n");
     //struct uthread_tcb *currentThread = uthread_current();
     //currentThread->exited = true;
     //uthread_yield();
@@ -168,6 +172,7 @@ void uthread_block(void)
 void uthread_unblock(struct uthread_tcb *uthread)
 {
 	/* TODO Phase 3 */
+    printf("here6\n");
     if (uthread != NULL) {
         uthread->exited = false;
         queue_enqueue(threadQueue, uthread);
