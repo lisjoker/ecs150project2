@@ -174,4 +174,3 @@ void uthread_unblock(struct uthread_tcb *uthread)
         queue_enqueue(threadQueue, uthread);
     }
 }
-
