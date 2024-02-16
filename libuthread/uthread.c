@@ -130,7 +130,8 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     while(queue_length(threadsRunning) != 0)
     {
         struct uthread_tcb *currentThread;
-        if (queue_dequeue(threadsRunning, (void **)&currentThread) == 0)
+        vaild = queue_dequeue(threadsRunning, (void **)&currentThread)
+        if (vaild == 0)
         {
             if (!currentThread->exited) 
             {
