@@ -99,7 +99,6 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     queue_t threadsRunning = queue_create();
     queue_t threadsExited = queue_create();
     struct uthread_tcb *mainThread;
-    struct uthread_tcb *currentThread;
     int vaild;
 
     // Set up preemption if preempt is true
@@ -127,17 +126,23 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     queue_enqueue(threadsRunning, mainThread);
 
     // Start the scheduling loop 
-    while(queue_dequeue(threadsRunning, (void **)&currentThread) == 0 || queue_length(threadsRunning) != 0)
+    while(queue_length(threadsRunning) != 0)
     {
-        if (!currentThread->exited) 
+        struct uthread_tcb *currentThread;
+        if (queue_dequeue(threadsRunning, (void **)&currentThread) == 0)
         {
-            uthread_yield();
-        } 
-        else 
-        {
-            // Move exited thread to the exited queue
-            queue_enqueue(threadsExited, currentThread);
+            if (!currentThread->exited) 
+            {
+                queue_enqueue(threadsRunning, currentThread);
+                uthread_ctx_switch(&(mainThread->context), &(currentThread->context));
+            } 
+            else 
+            {
+                // Move exited thread to the exited queue
+                queue_enqueue(threadsExited, currentThread);
+            }
         }
+        
     }
 
     // Stop preemption if it was started
