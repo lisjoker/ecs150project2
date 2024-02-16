@@ -131,8 +131,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     {
         if (!currentThread->exited) 
         {
-            queue_enqueue(threadsRunning, currentThread);
-            uthread_ctx_switch(&(mainThread->context), &(currentThread->context));
+            uthread_yield();
         } 
         else 
         {
