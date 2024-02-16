@@ -31,11 +31,18 @@ struct uthread_tcb *uthread_current(void) {
 }
 
 void uthread_yield(void) {
-    struct uthread_tcb *prev = uthread_current();
+    /*
+    struct uthread_tcb *oldThread = uthread_current();
 
     queue_enqueue(readyThreads, currThread);
     queue_dequeue(readyThreads, (void **)&currThread);
-    uthread_ctx_switch(&(prev->context), &(currThread->context));
+    uthread_ctx_switch(&(oldThread->context), &(currThread->context));
+    */
+    struct uthread_tcb *nextThread;
+    queue_enqueue(readyThreads, currThread);
+    queue_dequeue(readyThreads, (void **)&nextThread);
+    uthread_ctx_switch(&(currThread->context), &(nextThread->context));
+    currThread = nextThread;
 }
 
 void uthread_exit(void) {
