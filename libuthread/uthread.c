@@ -14,17 +14,21 @@
 #define ERR -1
 #define SUCC 0
 
-static queue_t threadQueue; // Global queue to manage all threads
+static queue_t readyThreads;
+static queue_t runningThreads;
+static queue_t exitedThreads;
+
+struct uthread_tcb *currentThread;
 
 struct uthread_tcb {
 	uthread_ctx_t context;      // Execution context
-    bool exited;           // Flag indicating whether the thread has exited
     void *stack;
 };
 
 struct uthread_tcb *uthread_current(void)
 {
 	/* TODO Phase 2/3 */
+    
 	struct uthread_tcb *currentThread;
     if (queue_dequeue(threadQueue, (void **)&currentThread) == 0) {
         // Re-enqueue the current thread to maintain the queue state
@@ -33,6 +37,8 @@ struct uthread_tcb *uthread_current(void)
     }
     // No thread is running
     return NULL;
+    
+    //return currentThread;
 }
 
 // Save the current thread and load the next thread from ready queue
@@ -132,17 +138,14 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
         struct uthread_tcb *nextThread;
 
         // Load the next thread in ready queue
-        int loaded = queue_dequeue(threadQueue, (void **)&nextThread);
+        queue_dequeue(threadQueue, (void **)&nextThread);
 
-        // there exist thread to yield
-        if (loaded == 0)
-        {
             // Save the current thread to the ready queue
-            queue_enqueue(threadQueue, currentThread);
+        queue_enqueue(threadQueue, currentThread);
 
             // Switch the contexts of the old and new thread
-            uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
-        }
+        uthread_ctx_switch(&(currentThread->context), &(nextThread->context));
+        
     }
 
     // Stop preemption if it was started
