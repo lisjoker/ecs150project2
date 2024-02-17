@@ -48,7 +48,6 @@ int sem_destroy(sem_t sem)
 	// Successful destruction
     return SUCC;
 }
-
 int sem_down(sem_t sem) 
 {
 	/* TODO Phase 3 */
