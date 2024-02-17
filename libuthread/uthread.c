@@ -21,12 +21,14 @@ struct uthread_tcb {
     uthread_ctx_t context;
 };
 
-struct uthread_tcb *uthread_current(void) {
+struct uthread_tcb *uthread_current(void) 
+{
     /* TODO Phase 2/3 */
     return currentThread;
 }
 
-void uthread_yield(void) {
+void uthread_yield(void) 
+{
     /* TODO Phase 2 */
     struct uthread_tcb *oldThread = uthread_current();
     int vaild;
@@ -45,7 +47,8 @@ void uthread_yield(void) {
 }
 
 // Like the yield function but without enqueue. 
-void uthread_exit(void) {
+void uthread_exit(void) 
+{
     /* TODO Phase 2 */
     struct uthread_tcb *oldThread = uthread_current();
     int vaild;
@@ -64,7 +67,8 @@ void uthread_exit(void) {
     }
 }
 
-int uthread_create(uthread_func_t func, void *arg) {
+int uthread_create(uthread_func_t func, void *arg) 
+{
     /* TODO Phase 2 */
     struct uthread_tcb *newThread; 
     int vaild;
@@ -89,11 +93,17 @@ int uthread_create(uthread_func_t func, void *arg) {
     return SUCC;
 }
 
-int uthread_run(bool preempt, uthread_func_t func, void *arg) {
+int uthread_run(bool preempt, uthread_func_t func, void *arg) 
+{
     /* TODO Phase 2 */
     struct uthread_tcb *idleThread;
     struct uthread_tcb *oldThread, *newThread;
     int vaild1, vaild2;
+
+    if (preempt) 
+    {
+        preempt_start(true);
+    }
 
     // Initialize the queue
     ThreadsQueue = queue_create();
@@ -129,14 +139,32 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
         // Switch the context between old and new thread
         uthread_ctx_switch(&(oldThread->context), &(currentThread->context));
     }
+
     queue_destroy(ThreadsQueue);
+    
+    // Stop preemption if it was started
+    if (preempt) 
+    {
+        preempt_stop();
+    }
+
     return SUCC;
 }
 
-void uthread_block(void) {
+void uthread_block(void) 
+{
     /* TODO Phase 3 */
+    // Block the currently running thread and yield to the next thread
+    struct uthread_tcb *currThread = uthread_current();
+    uthread_yield();
 }
 
-void uthread_unblock(struct uthread_tcb *uthread) {
+void uthread_unblock(struct uthread_tcb *uthread) 
+{
     /* TODO Phase 3 */
+    // Unblock the specified thread by removing it from the blocked state
+    // Add it back to the global queue
+    if (uthread != NULL) {
+        queue_enqueue(ThreadsQueue, uthread);
+    }
 }
