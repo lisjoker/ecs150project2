@@ -10,8 +10,6 @@
 #define ERR -1
 #define SUCC 0
 
-struct uthread_tcb *newThread;
-
 struct semaphore 
 {
 	/* TODO Phase 3 */
@@ -67,16 +65,13 @@ int sem_down(sem_t sem)
 
     if (sem->count > 0) 
 	{
-		newThread = uthread_current();
+		struct uthread_tcb *newThread = uthread_current();
         sem->count--;
 		// Unblock the previously blocked thread
         uthread_unblock(newThread);
     } 
 	else 
 	{
-		// Store the blocked thread's context
-        sem->waitQueue = uthread_current();
-        queue_enqueue(sem->waitQueue, sem->blockedCtx);
         uthread_block();  // Block the current thread
     }
 
