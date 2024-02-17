@@ -4,6 +4,7 @@
 #include "queue.h"
 #include "sem.h"
 #include "private.h"
+#include "uthread.h"
 
 // Define return error value.
 #define ERR -1
