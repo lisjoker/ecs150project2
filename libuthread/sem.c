@@ -68,9 +68,6 @@ int sem_down(sem_t sem)
         return ERR; // Invalid semaphore
     }
 
-	// Block the current thread
-    uthread_block();
-
 	while (sem->count == 0)
 	{
 		if (sem->count > 0) 
@@ -85,6 +82,7 @@ int sem_down(sem_t sem)
 			uthread_block();  // Block the current thread
 		}
 	}
+	sem->count--;
 
     return SUCC; // Successful down operation
 }
