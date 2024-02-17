@@ -21,13 +21,6 @@ o establish the foundational data structure for managing
 threads within the user-level thread library. The queue API 
 serves as the backbone for organizing and scheduling threads, 
 ensuring proper execution order and synchronization.
-## Design Choices
-Linked List Implementation: The queue is implemented using a linked 
-list data structure, allowing for efficient insertion and removal 
-of elements while preserving the order of execution.
-Error Handling: Error codes (SUCC and ERR) are defined to indicate 
-the success or failure of queue operations. Proper error handling 
-ensures the robustness and reliability of the library.
 
 `Phase 2: uthread API`
 `Thread Management`: The library provides functions for
@@ -45,15 +38,6 @@ The purpose of Phase 2 is to provide users with an interface
 to create and manage threads within the user-level thread library. 
 By implementing the uthread API, users can spawn new threads, 
 switch between threads, and control the execution flow of the program.
-## Design Choices:
-Thread Control Block (TCB): Each thread is represented by a Thread 
-Control Block (TCB), which contains information about the thread's 
-context and execution state. This design choice allows for efficient 
-management and manipulation of threads within the library.
-Queue Integration: The uthread API utilizes the queue API developed 
-in Phase 1 to maintain a queue of threads. This queue manages the 
-execution order of threads, ensuring proper synchronization 
-and scheduling.
 
 ### Phase 3: semaphore API
 `Semaphores`: Semaphores are synchronization primitives
@@ -68,18 +52,6 @@ accessing critical sections of code or shared data structures. T
 his helps prevent race conditions, which can lead to unpredictable 
 behavior and data corruption in concurrent programs.
 without encountering race conditions or deadlocks.
-## Design Choices:
-Semaphore Creation (sem_create()): This function is responsible for creating 
-a new semaphore with an initial value. Semaphores are initialized with a 
-non-negative integer value, typically representing the number of available 
-resources or permits.
-Semaphore Destruction (sem_destroy()): The sem_destroy() function deallocates 
-the resources associated with a semaphore when it is no longer needed. T
-his ensures proper cleanup and prevents memory leaks.
-Semaphore Down Operation (sem_down()): The sem_down() function, also known 
-as the "wait" or "P" operation, decrements the value of the semaphore. 
-If the semaphore value becomes negative, the calling thread is blocked 
-until resources become available.
 
 ### Phase 4: preemption
 `Preemption`: Preemption is a feature that allows the 
@@ -98,7 +70,33 @@ CPU resources among all threads. This prevents scenarios where a single
 thread might hog CPU time, leading to performance degradation and 
 unresponsiveness in a multi-threaded application.
 ## Design Choices:
-Priority-based Preemption: Threads with higher priority levels may 
+`phase1` :Linked List Implementation: The queue is implemented using a linked 
+list data structure, allowing for efficient insertion and removal 
+of elements while preserving the order of execution.
+Error Handling: Error codes (SUCC and ERR) are defined to indicate 
+the success or failure of queue operations. Proper error handling 
+ensures the robustness and reliability of the library.
+
+`phase2`:Thread Control Block (TCB): Each thread is represented by a Thread 
+Control Block (TCB), which contains information about the thread's 
+context and execution state. This design choice allows for efficient 
+management and manipulation of threads within the library.
+Queue Integration: The uthread API utilizes the queue API developed 
+in Phase 1 to maintain a queue of threads. This queue manages the 
+execution order of threads, ensuring proper synchronization 
+and scheduling.
+`phase3`:Semaphore Creation (sem_create()): This function is responsible for creating 
+a new semaphore with an initial value. Semaphores are initialized with a 
+non-negative integer value, typically representing the number of available 
+resources or permits.
+Semaphore Destruction (sem_destroy()): The sem_destroy() function deallocates 
+the resources associated with a semaphore when it is no longer needed. T
+his ensures proper cleanup and prevents memory leaks.
+Semaphore Down Operation (sem_down()): The sem_down() function, also known 
+as the "wait" or "P" operation, decrements the value of the semaphore. 
+If the semaphore value becomes negative, the calling thread is blocked 
+until resources become available.
+`phase3`:Priority-based Preemption: Threads with higher priority levels may 
 preempt threads with lower priority levels. This ensures that critical 
 threads are given precedence over less critical ones, contributing to
 better system responsiveness.
