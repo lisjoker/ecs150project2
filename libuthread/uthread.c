@@ -17,6 +17,7 @@
 
 queue_t ThreadsQueue;
 struct uthread_tcb *currentThread;
+sem_t block_lock;
 
 struct uthread_tcb {
     uthread_ctx_t context;
@@ -152,8 +153,9 @@ void uthread_block(void)
     {
         // Block the current thread by decrementing the semaphore
         
-        sem_t block_lock = sem_create(1);
+        block_lock = sem_create((size_t)1);
         sem_down(block_lock);
+        sem_destroy(block_lock);
     }
 }
 
@@ -164,7 +166,8 @@ void uthread_unblock(struct uthread_tcb *uthread)
     {
         // Unblock the specified thread by incrementing the semaphore
         
-        sem_t block_lock = sem_create(1);
+        block_lock = sem_create((size_t)1);
         sem_up(block_lock);
+        sem_destroy(block_lock);
     }
 }
