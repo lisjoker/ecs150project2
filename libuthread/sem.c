@@ -39,12 +39,20 @@ sem_t sem_create(size_t count)
 int sem_destroy(sem_t sem)
 {
 	/* TODO Phase 3 */
+	int vaild;
+
 	if ((sem == NULL) || (queue_length(sem->waitQueue) == 0)) 
 	{
         return ERR; // Invalid semaphore or threads still blocked
     }
 
-    queue_destroy(sem->waitQueue);
+    vaild = queue_destroy(sem->waitQueue);
+
+	if(vaild == ERR)
+	{
+		// There are still threads in queue
+		return ERR;
+	}
 
     free(sem);
 
@@ -63,17 +71,20 @@ int sem_down(sem_t sem)
 	// Block the current thread
     uthread_block();
 
-    if (sem->count > 0) 
+	while (sem->count == 0)
 	{
-		struct uthread_tcb *newThread = uthread_current();
-        sem->count--;
-		// Unblock the previously blocked thread
-        uthread_unblock(newThread);
-    } 
-	else 
-	{
-        uthread_block();  // Block the current thread
-    }
+		if (sem->count > 0) 
+		{
+			struct uthread_tcb *newThread = uthread_current();
+			sem->count--;
+			// Unblock the previously blocked thread
+			uthread_unblock(newThread);
+		} 
+		else 
+		{
+			uthread_block();  // Block the current thread
+		}
+	}
 
     return SUCC; // Successful down operation
 }
