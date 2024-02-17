@@ -69,39 +69,73 @@ CPU resources among all threads. This prevents scenarios where a single
 thread might hog CPU time, leading to performance degradation and 
 unresponsiveness in a multi-threaded application.
 ## Design Choices:
-`phase1` :Linked List Implementation: The queue is implemented using a linked 
-list data structure, allowing for efficient insertion and removal 
-of elements while preserving the order of execution.
-Error Handling: Error codes (SUCC and ERR) are defined to indicate 
-the success or failure of queue operations. Proper error handling 
+`phase1` :Linked List Implementation: The queue is implemented 
+using a linked list data structure, allowing for
+efficient insertion and removal 
+of elements while preserving the order of 
+execution.Error Handling: Error codes (SUCC and ERR) 
+are defined to indicate the success or failure of 
+queue operations. Proper error handling 
 ensures the robustness and reliability of the library.
 
-`phase2`:Thread Control Block (TCB): Each thread is represented by a Thread 
-Control Block (TCB), which contains information about the thread's 
-context and execution state. This design choice allows for efficient 
-management and manipulation of threads within the library.
-Queue Integration: The uthread API utilizes the queue API developed 
-in Phase 1 to maintain a queue of threads. This queue manages the 
-execution order of threads, ensuring proper synchronization 
+`phase2`:Thread Control Block (TCB): Each thread is 
+represented by a Thread Control Block (TCB), which 
+contains information about the thread's context and 
+execution state. This design choice allows for efficient 
+anagement and manipulation of threads within the library.
+Queue Integration: The uthread API utilizes the queue 
+API developed in Phase 1 to maintain a queue of threads. 
+This queue manages the execution order of threads, 
+ensuring proper synchronization 
 and scheduling.
-`phase3`:Semaphore Creation (sem_create()): This function is responsible for creating 
-a new semaphore with an initial value. Semaphores are initialized with a 
-non-negative integer value, typically representing the number of available 
-resources or permits.
-Semaphore Destruction (sem_destroy()): The sem_destroy() function deallocates 
-the resources associated with a semaphore when it is no longer needed. T
+
+`phase3`:Semaphore Creation (sem_create()): This function 
+is responsible for creating a new semaphore
+with an initial value. Semaphores are initialized with a 
+non-negative integer value, typically representing
+the number of available resources or permits.
+Semaphore Destruction (sem_destroy()): 
+The sem_destroy() function deallocates 
+the resources associated with a semaphore when 
+it is no longer needed. T
 his ensures proper cleanup and prevents memory leaks.
-Semaphore Down Operation (sem_down()): The sem_down() function, also known 
-as the "wait" or "P" operation, decrements the value of the semaphore. 
+Semaphore Down Operation (sem_down()): The sem_down() 
+function, also known as the "wait" or "P" operation, 
+decrements the value of the semaphore. 
 If the semaphore value becomes negative, the calling thread is blocked 
 until resources become available.
-`phase3`:Priority-based Preemption: Threads with higher priority levels may 
-preempt threads with lower priority levels. This ensures that critical 
-threads are given precedence over less critical ones, contributing to
-better system responsiveness.
-Preemption Points: Preemption points are specific locations in the code
-where the scheduler can interrupt the execution of a thread and switch 
-to another. These points are strategically placed to ensure that threads 
+
+`phase4`:Priority-based Preemption: Threads with 
+higher priority levels may preempt threads with lower
+priority levels. This ensures that critical 
+threads are given precedence over less critical ones, 
+contributing to better system responsiveness.
+Preemption Points: Preemption points are specific 
+locations in the codewhere the scheduler can interrupt
+the execution of a thread and switch to another. 
+These points are strategically placed to ensure that threads 
 can be preempted without causing data inconsistency or other issues.
 
-## Test
+## Testing
+To ensure the correctness and functionality of the queue 
+API, rigorous testing is required. Test cases should 
+cover various scenarios, including enqueueing and 
+dequeueing elements, queue destruction, iteration, and error 
+handling. Test cases should verify that the queue
+behaves as expected under different 
+conditions.
+
+To ensure the correctness and functionality of the thread API,
+comprehensive testing is necessary. Test cases should cover various 
+scenarios, including thread creation, switching between threads, blocking
+and unblocking threads, and error handling. Testing should verify that the 
+uthread API behaves as expected under different conditions and edge cases.
+Testing preemption involves verifying that threads are preempted 
+appropriately based on the chosen preemption strategy. Test cases 
+should cover scenarios such as threads running for longer than the 
+time quantum, higher priority threads preempting lower priority threads, 
+and proper handling of preemption points. Stress testing and performance
+profiling can also help assess the effectiveness of the preemption mechanism
+under various workloads.
+
+
