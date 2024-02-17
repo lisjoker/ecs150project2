@@ -10,6 +10,8 @@
 #define ERR -1
 #define SUCC 0
 
+struct uthread_tcb *newThread;
+
 struct semaphore 
 {
 	/* TODO Phase 3 */
@@ -39,7 +41,7 @@ sem_t sem_create(size_t count)
 int sem_destroy(sem_t sem)
 {
 	/* TODO Phase 3 */
-	if ((sem == NULL) || (queue_length(&sem->waitQueue) == 0)) 
+	if ((sem == NULL) || (queue_length(sem->waitQueue) == 0)) 
 	{
         return ERR; // Invalid semaphore or threads still blocked
     }
@@ -65,14 +67,15 @@ int sem_down(sem_t sem)
 
     if (sem->count > 0) 
 	{
+		newThread = uthread_current();
         sem->count--;
 		// Unblock the previously blocked thread
-        uthread_unblock(sem);
+        uthread_unblock(newThread);
     } 
 	else 
 	{
 		// Store the blocked thread's context
-        sem = uthread_current();
+        sem->waitQueue = uthread_current();
         queue_enqueue(sem->waitQueue, sem->blockedCtx);
         uthread_block();  // Block the current thread
     }
