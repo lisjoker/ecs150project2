@@ -21,4 +21,4 @@ private.o: private.h
 
 # Clean generated files
 clean:
-    rm -f $(ofile)
+    rm -f $(lib)
