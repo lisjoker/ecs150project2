@@ -9,7 +9,7 @@ The library offers essential functionalities for
 developing multi-threaded applications efficiently 
 and preventing concurrency issues.
 
-Phase 1: queue API
+`Phase 1: queue API`
 a First-In-First-Out (FIFO) `queue` data structure 
 to manage the order of execution for 
 threads. This means that threads are scheduled based 
@@ -21,13 +21,31 @@ o establish the foundational data structure for managing
 threads within the user-level thread library. The queue API 
 serves as the backbone for organizing and scheduling threads, 
 ensuring proper execution order and synchronization.
+##`Make decision`:
+Linked List Implementation: The queue is implemented using a linked 
+list data structure, allowing for efficient insertion and removal 
+of elements while preserving the order of execution.
+Error Handling: Error codes (SUCC and ERR) are defined to indicate 
+the success or failure of queue operations. Proper error handling 
+ensures the robustness and reliability of the library.
+
+`Phase 2: uthread API`
 `Thread Management`: The library provides functions for
 creating, destroying, enqueuing, dequeuing, deleting, 
 iterating, and determining the length of the queue. 
 These functions enable comprehensive management 
 of threads within the queue, allowing developers to 
-control thread execution 
-and synchronization.
+control thread execution and synchronization.The Phase
+2 of the program extends the functionality of the 
+user-level thread library by implementing the thread API.
+This API allows users to create, manage, and execute threads 
+in the library. It leverages the queue API developed in the 
+previous phase to store and schedule threads.
+The purpose of Phase 2 is to provide users with an interface 
+to create and manage threads within the user-level thread library. 
+By implementing the uthread API, users can spawn new threads, 
+switch between threads, and control the execution flow of the program.
+
 `Semaphores`: Semaphores are synchronization primitives
 used to control access to shared resources in 
 concurrent programs. The library implements semaphore 
