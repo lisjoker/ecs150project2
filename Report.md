@@ -149,3 +149,7 @@ profiling can also help assess the effectiveness of the preemption mechanism
 under various workloads.
 
 
+## Source
+Everything included in lecture slide, project script(
+        including the external links and idea form chatgpt).
+
