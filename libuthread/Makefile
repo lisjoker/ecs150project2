@@ -3,7 +3,6 @@ lib := libuthread.a
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -pedantic
 SRC = queue.c
-ofile := queue.o uthread.o context.o private.o preempt.o
 
 all: $(lib)
 
