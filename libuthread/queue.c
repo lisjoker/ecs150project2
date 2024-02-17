@@ -2,27 +2,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include "queue.h"
-
 // define success value
 #define SUCC 0
 // Define error value.
 #define ERR -1
-
-struct Node {
-		// pointer to the next element
-        struct Node *nextNode;
-		// pointer to the current element
-        void *data;
-    };
+struct Node 
+{
+	// pointer to the next element
+    struct Node *nextNode;
+	// pointer to the current element
+    void *data;
+};
 struct queue {
 	/* TODO Phase 1 */
-
     // front points to the first element in the linked structure
 	// rear points to the last element in the linked structure
     struct Node *front, *end;
     int size;
 };
-
 queue_t queue_create(void)
 {
 	/* TODO Phase 1 */
@@ -32,14 +29,11 @@ queue_t queue_create(void)
         // Handle memory allocation failure
         return NULL;
     }
-
 	new_queue->front = NULL;
     new_queue->end = NULL;
     new_queue->size = 0;
-
     return new_queue;
 }
-
 int queue_destroy(queue_t queue)
 {
 	/* TODO Phase 1 */
@@ -48,29 +42,23 @@ int queue_destroy(queue_t queue)
         // Queue is NULL or not empty, cannot destroy
         return ERR;
     }
-
     free(queue);
     return SUCC;
 }
-
 int queue_enqueue(queue_t queue, void *data)
 {
 	/* TODO Phase 1 */
     struct Node *last_node = (struct Node *)malloc(sizeof(struct Node));
     struct Node *new_node = (struct Node *)malloc(sizeof(struct Node));
-
 	if (queue == NULL || data == NULL || new_node == NULL) 
     {
         // Invalid parameters or memory allocation failure
         return ERR;
     }
-
     // Initialize the new node
 	new_node->data = data;
     new_node->nextNode = NULL;
-
     last_node = queue->end;
-
 	if (queue->end == NULL || queue->size == 0) 
     {
         // Queue is empty, front asnd end points to the same address
@@ -81,15 +69,12 @@ int queue_enqueue(queue_t queue, void *data)
         // Add the new node to the end of the queue
         last_node->nextNode = new_node;    // connects the new node to the existing last node
     }
-
     // updates the end pointer to point to the new node    
     queue->end = new_node;
-
     queue->size++;
     // New node added successgully
     return SUCC;
 }
-
 int queue_dequeue(queue_t queue, void **data)
 {
     struct Node* firstNode = malloc(sizeof(struct Node));
@@ -99,17 +84,14 @@ int queue_dequeue(queue_t queue, void **data)
         // Invalid parameters or empty queue
         return ERR;
     }
-
     // Get the first element in queue
     firstNode = queue->front;
     // Data stores the first thing in queue
     *data = firstNode->data;
     // Relocate the queue's first element to the second element
     queue->front = firstNode->nextNode;
-
     // The first element of the queue is now gone
     queue->size--;
-
     // Check if queue still contains elements
     if (queue->size == 0) 
     {
@@ -117,10 +99,8 @@ int queue_dequeue(queue_t queue, void **data)
         queue->front = NULL;
         queue->end = NULL;
     }
-
     return SUCC;
 }
-
 // Delete data from the queue
 int queue_delete(queue_t queue, void *data)
 {
@@ -130,10 +110,8 @@ int queue_delete(queue_t queue, void *data)
         // Invalid parameters or quque is empty
         return ERR;
     }
-
     struct Node *current = queue->front;
     struct Node *previous = NULL;
-
     while (current != NULL) 
     {
         // Checking for match
@@ -144,7 +122,6 @@ int queue_delete(queue_t queue, void *data)
             {
                 // Deleting the front node
                 queue->front = current->nextNode;
-
                 if (queue->front == NULL) 
                 {
                     // Queue is now empty
@@ -155,7 +132,6 @@ int queue_delete(queue_t queue, void *data)
             {
                 // Deleting a node in the middle or end
                 previous->nextNode = current->nextNode;
-
                 if (previous->nextNode == NULL) 
                 {
                     // Deleted the last node, update end
@@ -165,16 +141,13 @@ int queue_delete(queue_t queue, void *data)
             queue->size--;
             return SUCC;
         }
-
         // Update current node
         previous = current;
         current = current->nextNode;
     }
-
     // Data not found in the queue
     return ERR;
 }
-
 int queue_iterate(queue_t queue, queue_func_t func)
 {
 	/* TODO Phase 1 */
@@ -183,7 +156,6 @@ int queue_iterate(queue_t queue, queue_func_t func)
         // Invalid parameters
         return ERR;
     }
-
     struct Node *current = queue->front;
     while (current != NULL) 
     {
@@ -191,10 +163,8 @@ int queue_iterate(queue_t queue, queue_func_t func)
         func(queue, current->data);
         current = current->nextNode;
     }
-
     return SUCC;
 }
-
 int queue_length(queue_t queue)
 {
 	/* TODO Phase 1 */
@@ -203,6 +173,5 @@ int queue_length(queue_t queue)
         // Invalid parameter
         return ERR;
     }
-
     return queue->size;
 }
