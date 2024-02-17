@@ -9,6 +9,7 @@
 
 #include "private.h"
 #include "queue.h"
+#include "sem.h"
 
 // Define return error value.
 #define ERR -1
@@ -24,6 +25,7 @@ struct uthread_tcb {
 struct uthread_tcb *uthread_current(void) 
 {
     /* TODO Phase 2/3 */
+
     return currentThread;
 }
 
@@ -144,9 +146,25 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 void uthread_block(void) 
 {
     /* TODO Phase 3 */
+    struct uthread_tcb *current = uthread_current();
+
+    if (current != NULL) 
+    {
+        // Block the current thread by decrementing the semaphore
+        
+        sem_t block_lock = sem_create(1);
+        sem_down(&(block_lock));
+    }
 }
 
 void uthread_unblock(struct uthread_tcb *uthread) 
 {
     /* TODO Phase 3 */
+    if (uthread != NULL) 
+    {
+        // Unblock the specified thread by incrementing the semaphore
+        
+        sem_t block_lock = sem_create(1);
+        sem_up(&(block_lock));
+    }
 }
