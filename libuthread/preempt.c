@@ -30,14 +30,14 @@ void handler(int signum) {
 }
 
 
-void preempt_disable() {
+void preempt_disable(void) {
 	sigset_t block_alarm;
 	sigemptyset(&block_alarm);
 	sigaddset(&block_alarm, SIGVTALRM);
 	sigprocmask(SIG_BLOCK, &block_alarm, NULL);
 }
 
-void preempt_enable() {
+void preempt_enable(void) {
 	sigset_t unblock_alarm;
 	sigemptyset(&unblock_alarm);
 	sigaddset(&unblock_alarm, SIGVTALRM);
@@ -49,7 +49,7 @@ void preempt_enable() {
  * Configure a timer that must fire a virtual alarm at a frequency of 100 Hz and
  * setup a timer handler that forcefully yields the currently running thread.
  */
-void preempt_start() {
+void preempt_start(bool) {
 	// Idea:
 	// Every 100 Hz (by alarm), write a handler that calls uthread_yield
 
@@ -88,7 +88,7 @@ void preempt_start() {
  * Restore previous timer configuration, and previous action associated to
  * virtual alarm signals.
  */
-void preempt_stop() {
+void preempt_stop(void) {
 	if (sigaction(SIGVTALRM, &old_action, NULL) == -1) {
 		perror("sigaction");
 		exit(1);
