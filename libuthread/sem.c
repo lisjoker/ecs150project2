@@ -96,16 +96,12 @@ int sem_up(sem_t sem)
 
     sem->count++;
 
-	// waiting list associated to @sem is not empty
-    if (queue_length(sem->waitQueue) == 0) 
-	{
-        // Unblock the first thread from the wait_queue
-        struct uthread_tcb *blocked_thread;
-		// Dequeuing the first thread from queue
-        queue_dequeue(sem->waitQueue, (void **)&blocked_thread);
-		sem->blockedCtx = NULL;
-        uthread_unblock(blocked_thread);
-    }
+	// Unblock the first thread from the wait_queue
+	struct uthread_tcb *blocked_thread;
+	// Dequeuing the first thread from queue
+	queue_dequeue(sem->waitQueue, (void **)&blocked_thread);
+	sem->blockedCtx = NULL;
+	uthread_unblock(blocked_thread);
 
     return SUCC; // Successful up operation
 }
