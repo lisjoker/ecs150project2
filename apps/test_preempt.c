@@ -1,27 +1,40 @@
-// The idea here is that we create an initial thread that creates a second thread
-// The initial thread has an infinite while loop that tries to keep control of the CPU forever
-// But because of preemption, thread 2 gets a chance to run and completes its execution
-
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sem.h>
-#include <uthread.h>
 
-static void thread2(void *arg)
+#include <uthread.h>
+#include <preempt.c>
+#include <private.h>
+
+void thread3(void *arg)
 {
-	printf("thread 2 finished executing...\n");
+	(void)arg;
+	printf("\nI'm in thread 3, exit.\n");
+	exit(0);
 }
 
-static void thread1(void *arg)
+void thread2(void *arg)
 {
+	(void)arg;
+	uthread_create(thread3, NULL);
+	while (1)
+	{
+		printf("2");
+	}
+}
+
+void thread1(void *arg)
+{
+	(void)arg;
 	uthread_create(thread2, NULL);
-	while (1) {
-        // Keeps doing the while loop... tries not to give up control of CPU
-    }
+	while (1)
+	{
+		printf("1");
+	}
 }
 
 int main(void)
 {
-	uthread_start(thread1, NULL);
+	uthread_run(true, thread1, NULL);
 	return 0;
 }
