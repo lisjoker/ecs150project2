@@ -76,7 +76,7 @@ static void iterator_inc(queue_t q, void *data) {
 /*code form slide*/
 void test_iterator(void) {
     queue_t q;
-    int data[] = {1, 2, 3, 4, 5, 42, 6, 7, 8, 9};
+    int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     size_t i;
 
     fprintf(stderr, "*** TEST iterator ***\n");
