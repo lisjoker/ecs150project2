@@ -9,7 +9,7 @@ The library offers essential functionalities for
 developing multi-threaded applications efficiently 
 and preventing concurrency issues.
 
-## Phase 1: `queue API`
+### Phase 1: queue API
 a First-In-First-Out (FIFO) queue data structure 
 to manage the order of execution for 
 threads. This means that threads are scheduled based 
