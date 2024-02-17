@@ -16,4 +16,4 @@ private.o: private.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(lib) $(objs)
+	rm -f $(objs)
