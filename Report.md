@@ -151,5 +151,10 @@ under various workloads.
 
 ## Source
 Everything included in lecture slide, project script(
-        including the external links and idea form chatgpt).
+        including the external links and [idea form chatgpt]
+(https://www.gnu.org/software/libc/manual/2.36/html_mono/libc.html#Signal-Actions
+https://www.gnu.org/software/libc/manual/2.36/html_mono/libc.html#Setting-an-Ala
+rm)https://www.gnu.org/software/libc/manual/2.36/html_mono/libc.html#Signal-Actions
+https://www.gnu.org/software/libc/manual/2.36/html_mono/libc.html#Setting-an-Ala
+rm).
 
