@@ -10,8 +10,7 @@
 
 struct queue {
 	/* TODO Phase 1 */
-	struct Node 
-    {
+	struct Node {
 		// pointer to the next element
         struct Node *nextNode;
 		// pointer to the current element
