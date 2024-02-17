@@ -9,7 +9,6 @@
 
 #include "private.h"
 #include "queue.h"
-#include "sem.h"
 
 // Define return error value.
 #define ERR -1
@@ -17,7 +16,6 @@
 
 queue_t ThreadsQueue;
 struct uthread_tcb *currentThread;
-sem_t block_lock;
 
 struct uthread_tcb {
     uthread_ctx_t context;
@@ -147,27 +145,34 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 void uthread_block(void) 
 {
     /* TODO Phase 3 */
-    struct uthread_tcb *current = uthread_current();
+    struct uthread_tcb *oldThread = uthread_current();
 
-    if (current != NULL) 
+    if (oldThread != NULL) 
     {
-        // Block the current thread by decrementing the semaphore
-        
-        block_lock = sem_create((size_t)1);
-        sem_down(block_lock);
-        sem_destroy(block_lock);
+        // Remove the first thread in queue 
+        queue_dequeue(ThreadsQueue, (void**)&currentThread);
+        uthread_ctx_switch(&(oldThread->context), &(currentThread->context));
     }
 }
 
 void uthread_unblock(struct uthread_tcb *uthread) 
 {
     /* TODO Phase 3 */
+    struct uthread_tcb *oldThread = uthread_current();
+
     if (uthread != NULL) 
     {
-        // Unblock the specified thread by incrementing the semaphore
+        queue_enqueue(ThreadsQueue, uthread);
+
+        // first thread of the waiting list can be unblocked
+        // Load the new thred from queue
+        queue_dequeue(ThreadsQueue, (void **)&currentThread);
         
-        block_lock = sem_create((size_t)1);
-        sem_up(block_lock);
-        sem_destroy(block_lock);
+        // Save the old thread to queue
+        queue_enqueue(ThreadsQueue, oldThread);
+
+        // Switch the context between old and new thread
+        uthread_ctx_switch(&(oldThread->context), &(currentThread->context));
+        
     }
 }
