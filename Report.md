@@ -8,8 +8,7 @@ and ensuring fair scheduling through `preemption`.
 The library offers essential functionalities for 
 developing multi-threaded applications efficiently 
 and preventing concurrency issues.
-
-`Phase 1: queue API`
+### Phase 1: queue API
 a First-In-First-Out (FIFO) `queue` data structure 
 to manage the order of execution for 
 threads. This means that threads are scheduled based 
@@ -22,7 +21,7 @@ threads within the user-level thread library. The queue API
 serves as the backbone for organizing and scheduling threads, 
 ensuring proper execution order and synchronization.
 
-`Phase 2: uthread API`
+### Phase 2: uthread API
 `Thread Management`: The library provides functions for
 creating, destroying, enqueuing, dequeuing, deleting, 
 iterating, and determining the length of the queue. 
