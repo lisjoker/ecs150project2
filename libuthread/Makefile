@@ -3,11 +3,11 @@ objs := queue.o uthread.o context.o private.o sem.o preempt.o
 lib := libuthread.a
 CC := gcc
 CFLAGS := -Wall -Werror
-
 all: $(lib)
 
-$(lib): $(objs)
-	ar rcs $(lib) $(objs)
+
+$(lib): queue.o uthread.o context.o private.o sem.o preempt.o
+	ar rcs $(lib) queue.o uthread.o context.o private.o sem.o preempt.o
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -15,6 +15,7 @@ $(lib): $(objs)
 private.o: private.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-
 clean:
-	rm -f *~ $(lib) $(objs)
+	rm -f $(objs)
+
+
