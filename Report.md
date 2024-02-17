@@ -130,6 +130,16 @@ comprehensive testing is necessary. Test cases should cover various
 scenarios, including thread creation, switching between threads, blocking
 and unblocking threads, and error handling. Testing should verify that the 
 uthread API behaves as expected under different conditions and edge cases.
+
+To ensure the correctness and reliability of the Semaphore API, 
+thorough testing is essential. Test cases should cover 
+various scenarios, including multiple threads attempting 
+to acquire and release semaphores concurrently, handling of edge 
+cases such as semaphore destruction while threads are waiting, 
+and proper synchronization of access to shared resources. Additionally,
+stress testing can help identify potential race conditions or deadlock 
+situations.
+
 Testing preemption involves verifying that threads are preempted 
 appropriately based on the chosen preemption strategy. Test cases 
 should cover scenarios such as threads running for longer than the 
