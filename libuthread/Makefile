@@ -3,11 +3,11 @@ objs := queue.o uthread.o context.o private.o sem.o preempt.o
 lib := libuthread.a
 CC := gcc
 CFLAGS := -Wall -Werror
+
 all: $(lib)
 
-
-$(lib): queue.o uthread.o context.o private.o preempt.o
-	ar rcs $(lib) queue.o uthread.o context.o private.o preempt.o
+$(lib): $(objs)
+	ar rcs $(lib) $(objs)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -15,5 +15,13 @@ $(lib): queue.o uthread.o context.o private.o preempt.o
 private.o: private.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+# Dependencies
+queue.o: queue.c queue.h
+uthread.o: uthread.c uthread.h context.h queue.h private.h preempt.h sem.h
+context.o: context.c context.h
+private.o: private.c private.h
+sem.o: sem.c sem.h queue.h private.h uthread.h
+preempt.o: preempt.c preempt.h uthread.h context.h queue.h private.h sem.h
+
 clean:
-	rm -f $(objs)
+	rm -f $(lib) $(objs)
