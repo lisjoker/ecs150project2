@@ -155,7 +155,7 @@ void uthread_block(void)
 {
     /* TODO Phase 3 */
     // Block the currently running thread and yield to the next thread
-    struct uthread_tcb *currThread = uthread_current();
+    struct uthread_tcb *currentThread = uthread_current();
     uthread_yield();
 }
 
