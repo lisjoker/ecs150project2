@@ -8,14 +8,14 @@
 // Define error value.
 #define ERR -1
 
-struct queue {
-	/* TODO Phase 1 */
-	struct Node {
+struct Node {
 		// pointer to the next element
         struct Node *nextNode;
 		// pointer to the current element
         void *data;
     };
+struct queue {
+	/* TODO Phase 1 */
 
     // front points to the first element in the linked structure
 	// rear points to the last element in the linked structure
@@ -206,4 +206,3 @@ int queue_length(queue_t queue)
 
     return queue->size;
 }
-
