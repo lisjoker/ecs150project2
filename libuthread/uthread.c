@@ -9,7 +9,7 @@
 
 #include "private.h"
 #include "queue.h"
-#include "sem.h"
+//#include "sem.h"
 
 // Define return error value.
 #define ERR -1
