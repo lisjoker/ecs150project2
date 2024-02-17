@@ -94,14 +94,22 @@ int sem_up(sem_t sem)
         return ERR; // Invalid semaphore
     }
 
+	int vaild;
     sem->count++;
-
-	// Unblock the first thread from the wait_queue
-	struct uthread_tcb *blocked_thread;
-	// Dequeuing the first thread from queue
-	queue_dequeue(sem->waitQueue, (void **)&blocked_thread);
-	sem->blockedCtx = NULL;
-	uthread_unblock(blocked_thread);
+	// waiting list associated to @sem is not empty
+    if (queue_length(sem->waitQueue) == 0) 
+	{
+        // Unblock the first thread from the wait_queue
+        struct uthread_tcb *blocked_thread;
+		// Dequeuing the first thread from queue
+        vaild = queue_dequeue(sem->waitQueue, (void **)&blocked_thread);
+		if (vaild == ERR)
+		{
+			return ERR;
+		}
+		sem->blockedCtx = NULL;
+        uthread_unblock(blocked_thread);
+    }
 
     return SUCC; // Successful up operation
 }
