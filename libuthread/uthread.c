@@ -100,10 +100,6 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     struct uthread_tcb *oldThread, *newThread;
     int vaild1, vaild2;
 
-    if (preempt) 
-    {
-        preempt_start(true);
-    }
 
     // Initialize the queue
     ThreadsQueue = queue_create();
@@ -141,12 +137,6 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     }
 
     queue_destroy(ThreadsQueue);
-    
-    // Stop preemption if it was started
-    if (preempt) 
-    {
-        preempt_stop();
-    }
 
     return SUCC;
 }
@@ -154,17 +144,9 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 void uthread_block(void) 
 {
     /* TODO Phase 3 */
-    // Block the currently running thread and yield to the next thread
-    struct uthread_tcb *currentThread = uthread_current();
-    uthread_yield();
 }
 
 void uthread_unblock(struct uthread_tcb *uthread) 
 {
     /* TODO Phase 3 */
-    // Unblock the specified thread by removing it from the blocked state
-    // Add it back to the global queue
-    if (uthread != NULL) {
-        queue_enqueue(ThreadsQueue, uthread);
-    }
 }
