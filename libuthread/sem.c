@@ -39,7 +39,7 @@ sem_t sem_create(size_t count)
 int sem_destroy(sem_t sem)
 {
 	/* TODO Phase 3 */
-	if (sem == NULL || !queue_empty(&sem->waitQueue)) 
+	if ((sem == NULL) || (queue_length(&sem->waitQueue) == 0)) 
 	{
         return ERR; // Invalid semaphore or threads still blocked
     }
@@ -67,12 +67,12 @@ int sem_down(sem_t sem)
 	{
         sem->count--;
 		// Unblock the previously blocked thread
-        uthread_unblock(sem->blockedCtx);
+        uthread_unblock(sem);
     } 
 	else 
 	{
 		// Store the blocked thread's context
-        sem->blockedCtx = uthread_current();
+        sem = uthread_current();
         queue_enqueue(sem->waitQueue, sem->blockedCtx);
         uthread_block();  // Block the current thread
     }
@@ -90,12 +90,12 @@ int sem_up(sem_t sem)
     sem->count++;
 
 	// waiting list associated to @sem is not empty
-    if (queue_length(&sem->waitQueue) == 0) 
+    if (queue_length(sem->waitQueue) == 0) 
 	{
         // Unblock the first thread from the wait_queue
         struct uthread_tcb *blocked_thread;
 		// Dequeuing the first thread from queue
-        queue_dequeue(&sem->waitQueue, (void **)&blocked_thread);
+        queue_dequeue(sem->waitQueue, (void **)&blocked_thread);
 		sem->blockedCtx = NULL;
         uthread_unblock(blocked_thread);
     }
